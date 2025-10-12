@@ -9,8 +9,8 @@ import Foundation
 
 enum GameObjective: String, CaseIterable, Identifiable, Decodable, Encodable {
     case 합산_점수
-    case 점수_찾기
     case 점수_맞추기
+    case 시간_설정
     
     var id: String {
         return rawValue.replacingOccurrences(of: "_", with: " ")
