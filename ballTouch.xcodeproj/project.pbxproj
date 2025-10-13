@@ -7,8 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7A5677D42E9D1AA100380488 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 89601CBF2E9C7CE900713450 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		89601CC02E9C7CE900713450 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 89601CBF2E9C7CE900713450 /* RealmSwift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7A5677D52E9D1AA100380488 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				7A5677D42E9D1AA100380488 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		897FC1FA2E8D20B5004FCEC5 /* ballTouch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ballTouch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,6 +88,7 @@
 				897FC1F62E8D20B5004FCEC5 /* Sources */,
 				897FC1F72E8D20B5004FCEC5 /* Frameworks */,
 				897FC1F82E8D20B5004FCEC5 /* Resources */,
+				7A5677D52E9D1AA100380488 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
