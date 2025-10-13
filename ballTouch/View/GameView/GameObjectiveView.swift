@@ -49,7 +49,7 @@ struct GameObjectiveView: View {
                                     .multilineTextAlignment(.leading)
                             }
                         }
-                        .frame(width: 200)
+ //                       .frame(width: 300)
 
                         Spacer()
                         
@@ -86,8 +86,7 @@ struct GameObjectiveView: View {
                             Picker("", selection: $selectedScore) {
                                 ForEach(1..<4) { number in
                                     Text("\(number * 30)초")
-                                      //  .font(.custom("GmarketSansTTFMedium", size: 14))
-                                        .foregroundColor(Color("1F2020"))
+                                        .font(.custom("GmarketSansTTFMedium", size: 14))
                                 }
                             }
                             .font(.custom("GmarketSansTTFMedium", size: 14))
