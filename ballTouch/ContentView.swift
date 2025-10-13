@@ -45,16 +45,10 @@ struct ContentView: View {
                 if self.isGameObjectiveShow {
                     BottomSheetView($isGameObjectiveShow, height: 300) {
                         VStack {
-                            GameObjectiveView { objectiveItem in
+                            GameObjectiveView { objectiveItem, objectiveValue in
                                 self.selectedGameObjective = objectiveItem
                                 self.isGameObjectiveShow.toggle()
-                                // self.isObjectiveInputViewShow.toggle()
-                                Picker("\(self.selectedGameObjective.id )", selection: $selectedScore) {
-                                    ForEach(50..<500) { number in
-                                        Text("\(number)").tag(number as Int)
-                                    }
-                                }
-                                .pickerStyle(.wheel)
+
                             }
                         }
                     }
