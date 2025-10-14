@@ -9,9 +9,14 @@ import SwiftUI
 import Foundation
 
 struct GameObjectiveView: View {
+    
+    @State private var selectedScore: Int = 1
+    @State private var selectedTime: Int = 1
+    
+    @Binding var savedScoreIndex: Int
+    @Binding var savedTimeIndex: Int
+    
     var selectHandler: ((GameObjective, Int) -> Void)
-    @State private var selectedScore: Int = 4
-    @State private var selectedTime: Int = 2
     
     var body: some View {
         List {
@@ -50,7 +55,7 @@ struct GameObjectiveView: View {
                                     .multilineTextAlignment(.leading)
                             }
                         }
- 
+                        
                         Spacer()
                         
                         if objective == .합산_점수 {
@@ -74,8 +79,9 @@ struct GameObjectiveView: View {
                             }
                             .frame(width: 120)
                             .pickerStyle(.menu)
+                            .tint(Color("1F2020"))
                             .onAppear {
-                                self.selectedScore = 4
+                                self.selectedScore = savedScoreIndex
                             }
                         } else if objective == .시간_설정 {
                             Picker("", selection: $selectedTime) {
@@ -86,8 +92,9 @@ struct GameObjectiveView: View {
                             }
                             .frame(width: 120)
                             .pickerStyle(.menu)
+                            .tint(Color("1F2020"))
                             .onAppear {
-                                self.selectedTime = 2
+                                self.selectedTime = savedTimeIndex
                             }
                         }
                     }
