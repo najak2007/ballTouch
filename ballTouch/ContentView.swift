@@ -14,6 +14,8 @@ struct ContentView: View {
     @State private var selectedGameObjective: GameObjective = .합산_점수
     @State private var isObjectiveInputViewShow: Bool = false
     @State private var selectedScore: Int = 50
+    @State private var savedScoreIndex: Int = 4
+    @State private var savedTimeIndex: Int = 2
     
     var body: some View {
         NavigationView {
@@ -45,7 +47,7 @@ struct ContentView: View {
                 if self.isGameObjectiveShow {
                     BottomSheetView($isGameObjectiveShow, height: 300) {
                         VStack {
-                            GameObjectiveView { objectiveItem, objectiveValue in
+                            GameObjectiveView(savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex) { objectiveItem, objectiveValue in
                                 self.selectedGameObjective = objectiveItem
                                 self.isGameObjectiveShow.toggle()
 

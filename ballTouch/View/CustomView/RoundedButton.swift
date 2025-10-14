@@ -13,9 +13,10 @@ struct RoundedButton: View {
     var trailingImage: Image? = nil
     var fontSize: CGFloat = 18
     var fontName: String = "GmarketSansTTFMedium"
-    var backgroundColor: Color = Color(hex: "#EAFFFF")
-    var foregroundColor: Color = Color(hex: "#222222")
+    var backgroundColor: Color = Color("1F2020")
+    var foregroundColor: Color = Color("B_1F2020")
     var height: CGFloat = 40
+    var backgroundWidth: CGFloat = 120
     var action: () -> Void
     
     var body: some View {
@@ -39,7 +40,7 @@ struct RoundedButton: View {
                 }
             }
             .buttonStyle(.plain)
-            .frame(maxWidth: 100, maxHeight: height)
+            .frame(maxWidth: backgroundWidth, maxHeight: height)
             .padding(.horizontal, 8)
             .font(.custom(fontName, size: fontSize))
             .background(backgroundColor)                    // 배경색 설정
