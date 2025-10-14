@@ -10,7 +10,8 @@ import Foundation
 
 struct GameObjectiveView: View {
     var selectHandler: ((GameObjective, Int) -> Void)
-    @State private var selectedScore: Int = 1
+    @State private var selectedScore: Int = 4
+    @State private var selectedTime: Int = 2
     
     var body: some View {
         List {
@@ -29,31 +30,33 @@ struct GameObjectiveView: View {
                             if objective == .합산_점수 {
                                 Text("합산 점수가 제일 높으면 승리합니다.")
                                     .font(.custom("GmarketSansTTFMedium", size: 14))
-                                    .foregroundColor(Color("1F2020"))
+                                    .foregroundColor(Color("1F2020").opacity(0.6))
                                     .lineSpacing(4)
                                     .lineLimit(2)
                                     .multilineTextAlignment(.leading)
                             } else if objective == .점수_맞추기 {
-                                Text("50점만 합산, 그외 점수는 차감됩니다.")
+                                Text("\((selectedScore + 1)*10)점만 더하기, 그외 점수는 빼기")
                                     .font(.custom("GmarketSansTTFMedium", size: 14))
-                                    .foregroundColor(Color("1F2020"))
+                                    .foregroundColor(Color("1F2020").opacity(0.6))
                                     .lineSpacing(4)
                                     .lineLimit(2)
                                     .multilineTextAlignment(.leading)
                             } else if objective == .시간_설정 {
-                                Text("게임 시간을 설정해 주세요")
+                                Text("\((selectedTime + 1)*10)초 동안 게임 진행")
                                     .font(.custom("GmarketSansTTFMedium", size: 14))
-                                    .foregroundColor(Color("1F2020"))
+                                    .foregroundColor(Color("1F2020").opacity(0.6))
                                     .lineSpacing(4)
                                     .lineLimit(2)
                                     .multilineTextAlignment(.leading)
                             }
                         }
- //                       .frame(width: 300)
-
+ 
                         Spacer()
                         
                         if objective == .합산_점수 {
+#if true
+                            Spacer()
+#else
                             Text("합산 점수가 제일 높으면 승리")
                                 .font(.custom("GmarketSansTTFMedium", size: 14))
                                 .foregroundColor(Color("1F2020"))
@@ -61,42 +64,31 @@ struct GameObjectiveView: View {
                                 .lineLimit(2)
                                 .multilineTextAlignment(.leading)
                                 .frame(width: 120)
+#endif
                         } else if objective == .점수_맞추기 {
-                            Text("50점만 합산, 그외 점수는 차감")
-                                .font(.custom("GmarketSansTTFMedium", size: 14))
-                                .foregroundColor(Color("1F2020"))
-                                .lineSpacing(4)
-                                .lineLimit(2)
-                                .multilineTextAlignment(.leading)
-                                .frame(width: 120)
-                        } else if objective == .시간_설정 {
-#if false
-                            Menu("\(selectedScore * 30)초") {
-                                ForEach(2..<5) { number in
-                                    Button(action: {
-                                        selectedScore = number
-                                    }, label: {
-                                        Text("60초")
-                                            .font(.custom("GmarketSansTTFMedium", size: 14))
-                                            .foregroundColor(Color("1F2020"))
-                                    })
-                                }
-                            }
-#else
                             Picker("", selection: $selectedScore) {
-                                ForEach(1..<4) { number in
-                                    Text("\(number * 30)초")
+                                ForEach(1..<11) { number in
+                                    Text("\(number * 10)점")
                                         .font(.custom("GmarketSansTTFMedium", size: 14))
                                 }
                             }
-                            .font(.custom("GmarketSansTTFMedium", size: 14))
-                            .foregroundColor(Color("1F2020"))
-                            .lineSpacing(4)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
                             .frame(width: 120)
                             .pickerStyle(.menu)
-#endif
+                            .onAppear {
+                                self.selectedScore = 4
+                            }
+                        } else if objective == .시간_설정 {
+                            Picker("", selection: $selectedTime) {
+                                ForEach(1..<11) { number in
+                                    Text("\(number * 10)초")
+                                        .font(.custom("GmarketSansTTFMedium", size: 14))
+                                }
+                            }
+                            .frame(width: 120)
+                            .pickerStyle(.menu)
+                            .onAppear {
+                                self.selectedTime = 2
+                            }
                         }
                     }
                 })
