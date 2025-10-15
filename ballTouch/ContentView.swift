@@ -16,17 +16,67 @@ struct ContentView: View {
     @State private var selectedScore: Int = 50
     @State private var savedScoreIndex: Int = 4
     @State private var savedTimeIndex: Int = 2
+
     
     var body: some View {
         NavigationView {
             VStack {
+                HStack {
+                    HStack(spacing: 5) {
+                        Image(systemName: "gamecontroller.circle")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                        
+                        Text(selectedGameObjective.id)
+                            .font(.custom("GmarketSansTTFBold", size: 16))
+                            .foregroundColor(Color("1F2020"))
+                    }
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 5) {
+                        Image(systemName: "timer.circle")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                            
+#if true
+                        Menu(selectionIndex: $savedTimeIndex) { selectionIndex in
+                            savedTimeIndex = selectionIndex
+                        }.frame(width: 50, height: 25)
+#else
+                        Menu("안녕" /*"\((savedTimeIndex + 1) * 10)초" */) {
+                            ForEach(0..<10) { number in
+                                Button(action: {
+                                    savedTimeIndex = number
+                                }, label: {
+                                    Text("\((number + 1) * 10)초")
+                                        .font(.custom("GmarketSansTTFBold", size: 16))
+                                        .foregroundColor(Color("1F2020"))
+                                })
+                            }
+                        }
+                        .font(.custom("GmarketSansTTFMedium", size: 14))
+                        .foregroundColor(Color("1F2020").opacity(06))
+#endif
+                    }
+                }
+                .frame(height: Config.NAVIGATION_HEIGHT)
+                .padding(.horizontal, 20)
+                
                 Spacer()
-                ImageCircleButton(uiImage: UIImage(systemName: "gamecontroller")! as UIImage, size: $gameStartButtonSize, action: {
+                
+                Button(action: {
                     isGameStart.toggle()
                     HapticManager.instance.notification(type: .success)
+                }, label: {
+                    Image(systemName: "play.fill")
+                        .resizable()
+                        .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                        .foregroundColor(Color("1F2020"))
                 })
                 
                 Spacer()
+
                 RoundedButton(title: "Game 설정", action: {
                     isGameObjectiveShow.toggle()
                 })
@@ -45,9 +95,9 @@ struct ContentView: View {
                     }
                 
                 if self.isGameObjectiveShow {
-                    BottomSheetView($isGameObjectiveShow, height: 300) {
+                    BottomSheetView($isGameObjectiveShow, height: 350) {
                         VStack {
-                            GameObjectiveView(savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex) { objectiveItem, objectiveValue in
+                            GameObjectiveView(selectedGameObjective: $selectedGameObjective, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex) { objectiveItem, objectiveValue in
                                 self.selectedGameObjective = objectiveItem
                                 self.isGameObjectiveShow.toggle()
 
@@ -56,6 +106,11 @@ struct ContentView: View {
                     }
                 }
             }
+        }
+        .fullScreenCover(isPresented: $isGameStart, onDismiss: {
+            
+        }) {
+            
         }
     }
 }
