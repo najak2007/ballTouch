@@ -8,5 +8,9 @@
 import Foundation
 
 class Config {
-    static let GAME_START_BUTTON_SIZE: CGFloat = 100
+    
+    static let NAVIGATION_HEIGHT: CGFloat = 80
+    static let GAME_START_BUTTON_SIZE: CGFloat = 80
+    static let INPUT_VIEW_HEADER_FONT_SIZE: CGFloat = 14
+    
 }
