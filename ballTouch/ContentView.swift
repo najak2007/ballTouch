@@ -23,10 +23,6 @@ struct ContentView: View {
             VStack {
                 HStack {
                     HStack(spacing: 5) {
-                        Image(systemName: "gamecontroller.circle")
-                            .resizable()
-                            .frame(width: 25, height: 25)
-                        
                         Text(selectedGameObjective.id)
                             .font(.custom("GmarketSansTTFBold", size: 16))
                             .foregroundColor(Color("1F2020"))
@@ -69,7 +65,7 @@ struct ContentView: View {
                     isGameStart.toggle()
                     HapticManager.instance.notification(type: .success)
                 }, label: {
-                    Image(systemName: "play.fill")
+                    Image(systemName: "play.square.fill")
                         .resizable()
                         .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
                         .foregroundColor(Color("1F2020"))
