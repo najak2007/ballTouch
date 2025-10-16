@@ -16,3 +16,10 @@ enum GameObjective: String, CaseIterable, Identifiable, Decodable, Encodable {
         return rawValue.replacingOccurrences(of: "_", with: " ")
     }
 }
+
+enum GameState: Decodable, Encodable {
+    case 초기화
+    case 게임중
+    case 일시정지
+    case 게임완료
+}

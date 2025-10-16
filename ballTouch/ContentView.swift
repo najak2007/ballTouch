@@ -106,7 +106,7 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $isGameStart, onDismiss: {
             
         }) {
-            
+            GamePlayView(selectedGameObjective: $selectedGameObjective, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
         }
     }
 }
