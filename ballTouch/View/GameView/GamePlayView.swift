@@ -25,6 +25,7 @@ struct GamePlayView: View {
     @State private var gamePlayTimer: Timer?
     @State private var gameState: GameState = .초기화
     @State private var currentGeometry: GeometryProxy? = nil
+    @State private var playingTime: Int = 0
 
     var body: some View {
         ZStack {
@@ -182,8 +183,9 @@ struct GamePlayView: View {
     func pauseTimer() {
         gamePlayTimer?.invalidate()
         if let _ = gamePlayTimer {
-            let playingTime = getPlayingTime(startDate)
+            playingTime = getPlayingTime(startDate)
             let finishTime = getPlayingTime(startDate, endDate)
+            startDate = Date()
             pauseDate = startDate.addingTimeInterval(Double(finishTime - playingTime))
         }
         gamePlayTimer = nil
@@ -192,13 +194,18 @@ struct GamePlayView: View {
     
     func resumeTimer() {
         if let geometry = currentGeometry {
+            let playingTime = getPlayingTime(startDate)
+            let finishTime = getPlayingTime(startDate, endDate)
+            startDate = Date()
+            endDate = startDate.addingTimeInterval(Double(finishTime - playingTime))
+
             startTimer(geometry: geometry, isInit: false)
         }
     }
     
     func finishGame() {
-        stopTimer(isFinish: true)
-        balls.removeAll()
+//        stopTimer(isFinish: true)
+//        balls.removeAll()
     }
     
     func reGameStart() {
