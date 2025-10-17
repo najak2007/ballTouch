@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct GamePlayView: View {
     
@@ -26,6 +27,7 @@ struct GamePlayView: View {
     @State private var gameState: GameState = .초기화
     @State private var currentGeometry: GeometryProxy? = nil
     @State private var playingTime: Int = 0
+    @State private var gameCountTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
@@ -88,13 +90,6 @@ struct GamePlayView: View {
                             .monospacedDigit()
                             .italic()
                             .foregroundColor(Color("1F2020"))
-//                            .onAppear {
-//                                startDate = Date()
-//                                endDate = startDate.addingTimeInterval(Double((savedTimeIndex + 1) * 10))
-//                                DispatchQueue.main.asyncAfter(deadline: .now() + Double((savedTimeIndex + 1) * 10)) {
-//                                    self.finishGame()
-//                                }
-//                            }
                     }
                 }
                 .frame(height: Config.NAVIGATION_HEIGHT)
@@ -138,25 +133,41 @@ struct GamePlayView: View {
                             balls.append(Ball(in: geometry))
                         }
                         
-                        startTimer(geometry: geometry)
+                        startTimer(geometry: geometry, playingTime: (savedTimeIndex + 1) * 10)
                     }
                     .onDisappear {
-                        balls.removeAll()
+                        finishGame()
                     }
+                }
+            }
+        }
+        .onReceive(gameCountTimer) { _ in
+            if gameState == .게임중 {
+                if getPlayingTime(Date(), endDate) < 0 {
+                    self.finishGame()
+                    gameCountTimer.upstream.connect().cancel()
                 }
             }
         }
     }
     
-    func gameConfiguration() {
+    func gameConfiguration(_ isInit: Bool = true, _ playingTime: Int) {
+#if true
+        startDate = Date()
+        endDate = startDate.addingTimeInterval(Double(playingTime))
+        pauseDate = startDate.addingTimeInterval(0)
+#else
         startDate = Date()
         endDate = startDate.addingTimeInterval(Double((savedTimeIndex + 1) * 10))
         DispatchQueue.main.asyncAfter(deadline: .now() + Double((savedTimeIndex + 1) * 10)) {
-            self.finishGame()
+            if self.gameState == .게임중 {
+                self.finishGame()
+            }
         }
+#endif
     }
     
-    func startTimer(geometry: GeometryProxy, isInit: Bool = true) {
+    func startTimer(geometry: GeometryProxy, isInit: Bool = true, playingTime: Int) {
         currentGeometry = geometry
         gamePlayTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
             for i in 0..<balls.count {
@@ -169,8 +180,9 @@ struct GamePlayView: View {
             if score > 0 {
                 score = 0
             }
-            gameConfiguration()
         }
+        gameConfiguration(isInit, playingTime)
+        gameCountTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     }
     
     func stopTimer(isFinish: Bool = false) {
@@ -185,27 +197,25 @@ struct GamePlayView: View {
         if let _ = gamePlayTimer {
             playingTime = getPlayingTime(startDate)
             let finishTime = getPlayingTime(startDate, endDate)
-            startDate = Date()
             pauseDate = startDate.addingTimeInterval(Double(finishTime - playingTime))
         }
         gamePlayTimer = nil
         gameState = .일시정지
+        gameCountTimer.upstream.connect().cancel()
     }
     
     func resumeTimer() {
         if let geometry = currentGeometry {
-            let playingTime = getPlayingTime(startDate)
             let finishTime = getPlayingTime(startDate, endDate)
             startDate = Date()
             endDate = startDate.addingTimeInterval(Double(finishTime - playingTime))
-
-            startTimer(geometry: geometry, isInit: false)
+            startTimer(geometry: geometry, isInit: false, playingTime: (finishTime - playingTime))
         }
     }
     
     func finishGame() {
-//        stopTimer(isFinish: true)
-//        balls.removeAll()
+        stopTimer(isFinish: true)
+        balls.removeAll()
     }
     
     func reGameStart() {
@@ -213,7 +223,7 @@ struct GamePlayView: View {
             for _ in 0..<ballCount {
                 balls.append(Ball(in: geometry))
             }
-            startTimer(geometry: geometry)
+            startTimer(geometry: geometry, playingTime: (savedTimeIndex + 1) * 10)
         }
     }
     
