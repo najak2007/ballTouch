@@ -44,7 +44,6 @@ struct GamePlayView: View {
                     
                     Text("\(score)")
                         .font(.system(size: 18, weight: .semibold))
-                        .tracking(4)
                         .monospacedDigit()
                         .italic()
                         .foregroundColor(Color("1F2020"))
@@ -86,7 +85,6 @@ struct GamePlayView: View {
                             
                         )
                             .font(.system(size: 18, weight: .semibold))
-                            .tracking(4)
                             .monospacedDigit()
                             .italic()
                             .foregroundColor(Color("1F2020"))
@@ -99,32 +97,35 @@ struct GamePlayView: View {
                 GeometryReader { geometry in
                     ZStack {
                         ForEach(balls.indices, id: \.self) { index in
-                            if balls[index].isInside(geometry: geometry) {
-                                ZStack {
-                                    Circle()
-                                        .fill(balls[index].color)
-                                        .frame(width: balls[index].size, height: balls[index].size)
-                                        .scaleEffect(balls[index].isAnimating ? 0.2 : 1.0)
-                                    balls[index].label      // 라벨 추가
-                                }
-                                .position(balls[index].position)
-                                .gesture(
-                                    TapGesture(count: 1)
-                                        .onEnded {
-                                            if balls[index].touched == false, gameState == .게임중 {
-                                                score += balls[index].point
-                                                balls[index].touched = true
-                                                balls[index].isStopped = true
-                                                balls[index].isAnimating = true
-                                                balls[index].timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
-                                                    balls[index].reproduceBall(geometry: geometry)
-                                                    balls[index].isStopped = false
-                                                    balls[index].isAnimating = false
+                            
+                            if gameState == .게임중 {
+                                if balls[index].isInside(geometry: geometry) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(balls[index].color)
+                                            .frame(width: balls[index].size, height: balls[index].size)
+                                            .scaleEffect(balls[index].isAnimating ? 0.2 : 1.0)
+                                        balls[index].label      // 라벨 추가
+                                    }
+                                    .position(balls[index].position)
+                                    .gesture(
+                                        TapGesture(count: 1)
+                                            .onEnded {
+                                                if balls[index].touched == false, gameState == .게임중 {
+                                                    score += balls[index].point
+                                                    balls[index].touched = true
+                                                    balls[index].isStopped = true
+                                                    balls[index].isAnimating = true
+                                                    balls[index].timer = Timer.scheduledTimer(withTimeInterval: 0.0, repeats: false) { _ in
+                                                        balls[index].reproduceBall(geometry: geometry)
+                                                        balls[index].isStopped = false
+                                                        balls[index].isAnimating = false
+                                                    }
                                                 }
                                             }
-                                        }
-                                )
-                                .animation(.spring(), value: balls[index].isAnimating)
+                                    )
+                                    .animation(.spring(), value: balls[index].isAnimating)
+                                }
                             }
                         }
                     }
@@ -215,6 +216,7 @@ struct GamePlayView: View {
     
     func finishGame() {
         stopTimer(isFinish: true)
+        
         balls.removeAll()
     }
     
@@ -223,6 +225,7 @@ struct GamePlayView: View {
             for _ in 0..<ballCount {
                 balls.append(Ball(in: geometry))
             }
+
             startTimer(geometry: geometry, playingTime: (savedTimeIndex + 1) * 10)
         }
     }
