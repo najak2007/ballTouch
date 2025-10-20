@@ -93,6 +93,7 @@ struct GamePlayView: View {
                 }
                 .frame(height: Config.NAVIGATION_HEIGHT)
                 .padding(.horizontal, 20)
+                .padding(.top, 50)
 
                 
                 GeometryReader { geometry in
@@ -153,16 +154,16 @@ struct GamePlayView: View {
         }
         .overlay {
             ZStack(alignment: .center) {
-                Color.black.opacity(0.6).opacity(isGameResultShow ? 1: 0)
+                Color.black.opacity(0.2).opacity(isGameResultShow ? 1: 0)
                     .onTapGesture {
-                        self.isGameResultShow.toggle()
+                       // self.isGameResultShow.toggle()
                     }
                 
                 if self.isGameResultShow == true {
                     VStack(spacing: 100) {
                         HStack(spacing: 80) {
                             Button(action: {
-                                
+                                self.isGameResultShow.toggle()
                             }, label: {
                                 Image(systemName: "list.number")
                                     .resizable()
@@ -171,6 +172,7 @@ struct GamePlayView: View {
                             })
                             
                             Button(action: {
+                                self.isGameResultShow.toggle()
                                 self.reGameStart()
                             }, label: {
                                 Image(systemName: "repeat.circle.fill")
@@ -191,7 +193,9 @@ struct GamePlayView: View {
                 }
             }
         }
+        .ignoresSafeArea()
     }
+    
     
     func gameConfiguration(_ isInit: Bool = true, _ playingTime: Int) {
 #if true

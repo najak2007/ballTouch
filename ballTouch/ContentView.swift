@@ -58,6 +58,7 @@ struct ContentView: View {
                 }
                 .frame(height: Config.NAVIGATION_HEIGHT)
                 .padding(.horizontal, 20)
+ 
                 
                 Spacer()
                 
@@ -108,5 +109,6 @@ struct ContentView: View {
         }) {
             GamePlayView(selectedGameObjective: $selectedGameObjective, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
         }
+        .ignoresSafeArea()
     }
 }
