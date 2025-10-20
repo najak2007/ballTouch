@@ -28,6 +28,7 @@ struct GamePlayView: View {
     @State private var currentGeometry: GeometryProxy? = nil
     @State private var playingTime: Int = 0
     @State private var gameCountTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State private var isGameResultShow: Bool = false
 
     var body: some View {
         ZStack {
@@ -150,6 +151,46 @@ struct GamePlayView: View {
                 }
             }
         }
+        .overlay {
+            ZStack(alignment: .center) {
+                Color.black.opacity(0.6).opacity(isGameResultShow ? 1: 0)
+                    .onTapGesture {
+                        self.isGameResultShow.toggle()
+                    }
+                
+                if self.isGameResultShow == true {
+                    VStack(spacing: 100) {
+                        HStack(spacing: 80) {
+                            Button(action: {
+                                
+                            }, label: {
+                                Image(systemName: "list.number")
+                                    .resizable()
+                                    .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                                    .foregroundColor(Color("1F2020"))
+                            })
+                            
+                            Button(action: {
+                                self.reGameStart()
+                            }, label: {
+                                Image(systemName: "repeat.circle.fill")
+                                    .resizable()
+                                    .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                                    .foregroundColor(Color("1F2020"))
+                            })
+                        }
+                        
+                        Button(action: {
+                            dismiss()
+                        }, label: {
+                            Text("ⓧ")
+                                .font(.system(size: Config.GAME_START_BUTTON_SIZE, weight: .semibold))
+                                .foregroundColor(Color("1F2020"))
+                        })
+                    }
+                }
+            }
+        }
     }
     
     func gameConfiguration(_ isInit: Bool = true, _ playingTime: Int) {
@@ -218,6 +259,8 @@ struct GamePlayView: View {
         stopTimer(isFinish: true)
         
         balls.removeAll()
+        
+        self.isGameResultShow.toggle()
     }
     
     func reGameStart() {
