@@ -109,6 +109,9 @@ struct ContentView: View {
         }) {
             GamePlayView(selectedGameObjective: $selectedGameObjective, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
         }
+        .transaction { transaction in
+            transaction.disablesAnimations = true
+        }
         .ignoresSafeArea()
     }
 }

@@ -29,6 +29,7 @@ struct GamePlayView: View {
     @State private var playingTime: Int = 0
     @State private var gameCountTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var isGameResultShow: Bool = false
+    @State private var isGamePointListShow: Bool = false
 
     var body: some View {
         ZStack {
@@ -156,7 +157,9 @@ struct GamePlayView: View {
             ZStack(alignment: .center) {
                 Color.black.opacity(0.2).opacity(isGameResultShow ? 1: 0)
                     .onTapGesture {
-                       // self.isGameResultShow.toggle()
+#if __NOT_USE__
+                        self.isGameResultShow.toggle()
+#endif
                     }
                 
                 if self.isGameResultShow == true {
@@ -164,6 +167,7 @@ struct GamePlayView: View {
                         HStack(spacing: 80) {
                             Button(action: {
                                 self.isGameResultShow.toggle()
+                                self.isGamePointListShow.toggle()
                             }, label: {
                                 Image(systemName: "list.number")
                                     .resizable()
@@ -192,6 +196,12 @@ struct GamePlayView: View {
                     }
                 }
             }
+            .padding(.top, 50)
+        }
+        .fullScreenCover(isPresented: $isGamePointListShow, onDismiss: {
+            
+        }) {
+            
         }
         .ignoresSafeArea()
     }
@@ -264,7 +274,9 @@ struct GamePlayView: View {
         
         balls.removeAll()
         
-        self.isGameResultShow.toggle()
+        DispatchQueue.main.asyncAfter(deadline: .now() + Config.GAME_RESULT_VIEW_FINISH_DELAY) {
+            self.isGameResultShow.toggle()
+        }
     }
     
     func reGameStart() {
