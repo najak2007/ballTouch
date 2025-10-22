@@ -19,14 +19,22 @@ struct Ball: Identifiable {
     var label: Text
     var speed: CGFloat = CGFloat(Int.random(in: 5...15))
     var isAnimating: Bool = false
+    var playMode: GamePlayMode = .빗방울
     
-    
-    init(in geometry: GeometryProxy) {
+    init(in geometry: GeometryProxy, gameMode selectedGameObjective: GameObjective = .합산_점수, playMode gamePlayMode: GamePlayMode = .빗방울) {
         position = Ball.getRandomPosition(in: geometry)
         size = CGFloat.random(in: 50...100)
         color = .random
         point = (Int.random(in: 1...10)) * 10
         label = Text(String(point))
+        
+        if selectedGameObjective == .합산_점수 {
+            speed = CGFloat(Int.random(in: 5...15))
+        } else {
+            speed = CGFloat(Int.random(in: 2...6))
+        }
+        
+        playMode = gamePlayMode
     }
     
     mutating func updatePosition(in geometry: GeometryProxy) {

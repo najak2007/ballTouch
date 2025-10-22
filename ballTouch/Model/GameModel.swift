@@ -23,3 +23,12 @@ enum GameState: Decodable, Encodable {
     case 일시정지
     case 게임완료
 }
+
+enum GamePlayMode: String, CaseIterable, Identifiable, Decodable, Encodable {
+    case 빗방울
+    case 두더지
+
+    var id: String {
+        return rawValue
+    }
+}

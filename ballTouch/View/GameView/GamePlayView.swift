@@ -17,6 +17,7 @@ struct GamePlayView: View {
     let ballCount = 7
     
     @Binding var selectedGameObjective: GameObjective
+    @Binding var gamePlayMode: GamePlayMode
     @Binding var savedScoreIndex: Int
     @Binding var savedTimeIndex: Int
     
@@ -109,7 +110,6 @@ struct GamePlayView: View {
                 GeometryReader { geometry in
                     ZStack {
                         ForEach(balls.indices, id: \.self) { index in
-                            
                             if gameState == .게임중 {
                                 if balls[index].isInside(geometry: geometry) {
                                     ZStack {
@@ -126,9 +126,9 @@ struct GamePlayView: View {
                                                 if balls[index].touched == false, gameState == .게임중 {
                                                     if selectedGameObjective == .점수_맞추기 {
                                                         if ((savedScoreIndex + 1) * 10) == balls[index].point {
-                                                            score += balls[index].point
+                                                            score += 1
                                                         } else {
-                                                            score -= balls[index].point
+                                                            score -= 1
                                                         }
                                                     } else {
                                                         score += balls[index].point
@@ -157,7 +157,7 @@ struct GamePlayView: View {
                         startTimer(geometry: geometry, playingTime: (savedTimeIndex + 1) * 10)
                     }
                     .onDisappear {
-                        finishGame()
+                        finishGame(true)
                     }
                 }
             }
@@ -287,13 +287,15 @@ struct GamePlayView: View {
         }
     }
     
-    func finishGame() {
+    func finishGame(_ isDisappear: Bool = false) {
         stopTimer(isFinish: true)
         
         balls.removeAll()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + Config.GAME_RESULT_VIEW_FINISH_DELAY) {
-            self.isGameResultShow.toggle()
+        if isDisappear == false {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Config.GAME_RESULT_VIEW_FINISH_DELAY) {
+                self.isGameResultShow.toggle()
+            }
         }
     }
     
