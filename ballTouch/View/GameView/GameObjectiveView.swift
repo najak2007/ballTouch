@@ -51,12 +51,26 @@ struct GameObjectiveView: View {
                                         }
                                         
                                         if objective == .합산_점수 {
-                                            Text(objective == .합산_점수 ? "합산 점수가 제일 높으면 승리합니다." : "\((selectedScore + 1)*10)점만 더하기, 그외 점수는 빼기")
+                                            Text(objective == .합산_점수 ? "합산 점수가 제일 높으면 승리합니다." : "\((selectedScore + 1)*10)점만 +1, 그외 점수는 -1")
                                                 .font(.custom("GmarketSansTTFMedium", size: 14))
                                                 .foregroundColor(Color("1F2020").opacity(0.6))
                                                 .lineSpacing(4)
                                                 .lineLimit(2)
                                                 .multilineTextAlignment(.leading)
+                                        } else {
+
+#if __NOT_USE__
+                                            Text(sttributedString)
+                                                .lineSpacing(4)
+                                                .lineLimit(2)
+                                                .multilineTextAlignment(.leading)
+#else
+                                            Text(setSubAttributedString(selectedScore))
+                                                .lineSpacing(4)
+                                                .lineLimit(2)
+                                                .multilineTextAlignment(.leading)
+
+#endif
                                         }
                                     }
                                     
@@ -87,6 +101,11 @@ struct GameObjectiveView: View {
                                         .onAppear {
                                             self.selectedScore = savedScoreIndex
                                         }
+                                        .onChange(of: selectedScore) { oldValue, newValue in
+                                            if oldValue != newValue {
+                                                savedScoreIndex = newValue
+                                            }
+                                        }
                                     }
                                 }
                             })
@@ -115,7 +134,7 @@ struct GameObjectiveView: View {
                             Spacer()
                             
                             Picker("", selection: $selectedTime) {
-                                ForEach(1..<11) { number in
+                                ForEach(1..<7) { number in
                                     Text("\(number * 10)초")
                                         .font(.custom("GmarketSansTTFMedium", size: 14))
                                 }
@@ -137,5 +156,26 @@ struct GameObjectiveView: View {
         }
         .environment(\.defaultMinListRowHeight, 80)
         .scrollDisabled(true)
+    }
+    
+    func setSubAttributedString(_ selectedScore: Int) -> AttributedString {
+        var sttributedString = AttributedString("\((selectedScore + 1)*10)점만 +1 그외 점수는 -1")
+            
+        if let fullRange = sttributedString.range(of: "\((selectedScore + 1)*10)점만 +1 그외 점수는 -1") {
+            sttributedString[fullRange].foregroundColor = Color("1F2020").opacity(0.6)
+            sttributedString[fullRange].font = .custom("GmarketSansTTFMedium", size: 14)
+        }
+        
+        if let plusRange = sttributedString.range(of: "＋1") {
+            sttributedString[plusRange].foregroundColor = .red
+            sttributedString[plusRange].font = .custom("GmarketSansTTFBold", size: 15)
+        }
+        
+        if let minusRange = sttributedString.range(of: "-1") {
+            sttributedString[minusRange].foregroundColor = .blue
+            sttributedString[minusRange].font = .custom("GmarketSansTTFBold", size: 15)
+        }
+        
+        return sttributedString
     }
 }

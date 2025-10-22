@@ -29,6 +29,8 @@ struct GamePlayView: View {
     @State private var playingTime: Int = 0
     @State private var gameCountTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var isGameResultShow: Bool = false
+    @State private var isGamePointListShow: Bool = false
+
 
     var body: some View {
         ZStack {
@@ -37,10 +39,18 @@ struct GamePlayView: View {
 #endif
             VStack {
                 HStack {
-                    Text(selectedGameObjective.id)
-                        .font(.custom("GmarketSansTTFBold", size: 16))
-                        .foregroundColor(Color("1F2020"))
-                    
+                    HStack(spacing: 5) {
+                        Text(selectedGameObjective.id)
+                            .font(.custom("GmarketSansTTFBold", size: 16))
+                            .foregroundColor(Color("1F2020"))
+                        
+                        
+                        if selectedGameObjective == .점수_맞추기 {
+                            Text(" 🎯\((savedScoreIndex + 1) * 10)점")
+                                .font(.custom("GmarketSansTTFBold", size: 18))
+                                .foregroundColor(Color("1F2020"))
+                        }
+                    }
                     Spacer()
                     
                     Text("\(score)")
@@ -114,7 +124,15 @@ struct GamePlayView: View {
                                         TapGesture(count: 1)
                                             .onEnded {
                                                 if balls[index].touched == false, gameState == .게임중 {
-                                                    score += balls[index].point
+                                                    if selectedGameObjective == .점수_맞추기 {
+                                                        if ((savedScoreIndex + 1) * 10) == balls[index].point {
+                                                            score += balls[index].point
+                                                        } else {
+                                                            score -= balls[index].point
+                                                        }
+                                                    } else {
+                                                        score += balls[index].point
+                                                    }
                                                     balls[index].touched = true
                                                     balls[index].isStopped = true
                                                     balls[index].isAnimating = true
@@ -156,21 +174,24 @@ struct GamePlayView: View {
             ZStack(alignment: .center) {
                 Color.black.opacity(0.2).opacity(isGameResultShow ? 1: 0)
                     .onTapGesture {
-                       // self.isGameResultShow.toggle()
+#if __NOT_USE__
+                        self.isGameResultShow.toggle()
+#endif
                     }
                 
                 if self.isGameResultShow == true {
                     VStack(spacing: 100) {
-                        HStack(spacing: 80) {
+                        HStack(spacing: 50) {
                             Button(action: {
                                 self.isGameResultShow.toggle()
+                                self.isGamePointListShow.toggle()
                             }, label: {
                                 Image(systemName: "list.number")
                                     .resizable()
                                     .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
                                     .foregroundColor(Color("1F2020"))
                             })
-                            
+
                             Button(action: {
                                 self.isGameResultShow.toggle()
                                 self.reGameStart()
@@ -180,18 +201,25 @@ struct GamePlayView: View {
                                     .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
                                     .foregroundColor(Color("1F2020"))
                             })
+                            
+                            Button(action: {
+                                dismiss()
+                            }, label: {
+                                Image(systemName: "rectangle.portrait.and.arrow.forward")
+                                    .resizable()
+                                    .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                                    .foregroundColor(Color("1F2020"))
+                            })
                         }
-                        
-                        Button(action: {
-                            dismiss()
-                        }, label: {
-                            Text("ⓧ")
-                                .font(.system(size: Config.GAME_START_BUTTON_SIZE, weight: .semibold))
-                                .foregroundColor(Color("1F2020"))
-                        })
                     }
                 }
             }
+            .padding(.top, 50)
+        }
+        .fullScreenCover(isPresented: $isGamePointListShow, onDismiss: {
+            
+        }) {
+            GameResultListView(selectedGameObjective: $selectedGameObjective, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
         }
         .ignoresSafeArea()
     }
@@ -264,7 +292,9 @@ struct GamePlayView: View {
         
         balls.removeAll()
         
-        self.isGameResultShow.toggle()
+        DispatchQueue.main.asyncAfter(deadline: .now() + Config.GAME_RESULT_VIEW_FINISH_DELAY) {
+            self.isGameResultShow.toggle()
+        }
     }
     
     func reGameStart() {
