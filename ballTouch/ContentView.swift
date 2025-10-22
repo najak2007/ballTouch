@@ -12,6 +12,7 @@ struct ContentView: View {
     @State private var isGameStart: Bool = false
     @State private var isGameObjectiveShow: Bool = false
     @State private var selectedGameObjective: GameObjective = .합산_점수
+    @State private var gamePlayMode: GamePlayMode = .빗방울
     @State private var isObjectiveInputViewShow: Bool = false
     @State private var selectedScore: Int = 50
     @State private var savedScoreIndex: Int = 4
@@ -98,9 +99,9 @@ struct ContentView: View {
                     }
                 
                 if self.isGameObjectiveShow {
-                    BottomSheetView($isGameObjectiveShow, height: 350) {
+                    BottomSheetView($isGameObjectiveShow, height: 550) {
                         VStack {
-                            GameObjectiveView(selectedGameObjective: $selectedGameObjective, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex) { objectiveItem, objectiveValue in
+                            GameObjectiveView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex) { objectiveItem, objectiveValue in
                                 self.selectedGameObjective = objectiveItem
                                 self.isGameObjectiveShow.toggle()
 
@@ -113,7 +114,7 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $isGameStart, onDismiss: {
             
         }) {
-            GamePlayView(selectedGameObjective: $selectedGameObjective, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
+            GamePlayView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
         }
         .transaction { transaction in
             transaction.disablesAnimations = true
