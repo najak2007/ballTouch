@@ -26,6 +26,12 @@ struct ContentView: View {
                         Text(selectedGameObjective.id)
                             .font(.custom("GmarketSansTTFBold", size: 16))
                             .foregroundColor(Color("1F2020"))
+                        
+                        if selectedGameObjective == .점수_맞추기 {
+                            Text(" 🎯\((savedScoreIndex + 1) * 10)점")
+                                .font(.custom("GmarketSansTTFBold", size: 18))
+                                .foregroundColor(Color("1F2020"))
+                        }
                     }
                     
                     Spacer()

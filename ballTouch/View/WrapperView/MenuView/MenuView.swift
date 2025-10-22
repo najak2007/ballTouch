@@ -29,8 +29,14 @@ class MenuButton: UIButton {
         setTitle("\((selectionIndex + 1) * 10)초", for: .normal)
         setTitleColor(UIColor(named: "1F2020"), for: .normal)
         titleLabel?.font = UIFont(name: "GmarketSansTTFBold", size: 16)
+#if __NOT_USE__
         menu = UIMenu(title: "", children: [second10Action, second20Action, second30Action, second40Action, second50Action,
                                            second60Action, second70Action, second80Action, second90Action, second100Action])
+#else
+        menu = UIMenu(title: "", children: [second10Action, second20Action, second30Action, second40Action, second50Action,
+                                           second60Action])
+
+#endif
         menu?.preferredElementSize = .automatic
         showsMenuAsPrimaryAction = true
         

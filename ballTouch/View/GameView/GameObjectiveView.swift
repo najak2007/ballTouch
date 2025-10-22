@@ -50,14 +50,12 @@ struct GameObjectiveView: View {
                                                 .padding(.leading, 0)
                                         }
                                         
-                                        if objective == .합산_점수 {
-                                            Text(objective == .합산_점수 ? "합산 점수가 제일 높으면 승리합니다." : "\((selectedScore + 1)*10)점만 더하기, 그외 점수는 빼기")
-                                                .font(.custom("GmarketSansTTFMedium", size: 14))
-                                                .foregroundColor(Color("1F2020").opacity(0.6))
-                                                .lineSpacing(4)
-                                                .lineLimit(2)
-                                                .multilineTextAlignment(.leading)
-                                        }
+                                        Text(objective == .합산_점수 ? "합산 점수가 제일 높으면 승리합니다." : "\((selectedScore + 1)*10)점만 더하기, 그외 점수는 빼기")
+                                            .font(.custom("GmarketSansTTFMedium", size: 14))
+                                            .foregroundColor(Color("1F2020").opacity(0.6))
+                                            .lineSpacing(4)
+                                            .lineLimit(2)
+                                            .multilineTextAlignment(.leading)
                                     }
                                     
                                     Spacer()
@@ -87,6 +85,11 @@ struct GameObjectiveView: View {
                                         .onAppear {
                                             self.selectedScore = savedScoreIndex
                                         }
+                                        .onChange(of: selectedScore) { oldValue, newValue in
+                                            if oldValue != newValue {
+                                                savedScoreIndex = newValue
+                                            }
+                                        }
                                     }
                                 }
                             })
@@ -115,7 +118,7 @@ struct GameObjectiveView: View {
                             Spacer()
                             
                             Picker("", selection: $selectedTime) {
-                                ForEach(1..<11) { number in
+                                ForEach(1..<7) { number in
                                     Text("\(number * 10)초")
                                         .font(.custom("GmarketSansTTFMedium", size: 14))
                                 }

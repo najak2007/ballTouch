@@ -31,6 +31,7 @@ struct GamePlayView: View {
     @State private var isGameResultShow: Bool = false
     @State private var isGamePointListShow: Bool = false
 
+
     var body: some View {
         ZStack {
 #if __NOT_USE__
@@ -164,7 +165,7 @@ struct GamePlayView: View {
                 
                 if self.isGameResultShow == true {
                     VStack(spacing: 100) {
-                        HStack(spacing: 80) {
+                        HStack(spacing: 50) {
                             Button(action: {
                                 self.isGameResultShow.toggle()
                                 self.isGamePointListShow.toggle()
@@ -174,7 +175,7 @@ struct GamePlayView: View {
                                     .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
                                     .foregroundColor(Color("1F2020"))
                             })
-                            
+
                             Button(action: {
                                 self.isGameResultShow.toggle()
                                 self.reGameStart()
@@ -184,15 +185,16 @@ struct GamePlayView: View {
                                     .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
                                     .foregroundColor(Color("1F2020"))
                             })
+                            
+                            Button(action: {
+                                dismiss()
+                            }, label: {
+                                Image(systemName: "rectangle.portrait.and.arrow.forward")
+                                    .resizable()
+                                    .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                                    .foregroundColor(Color("1F2020"))
+                            })
                         }
-                        
-                        Button(action: {
-                            dismiss()
-                        }, label: {
-                            Text("ⓧ")
-                                .font(.system(size: Config.GAME_START_BUTTON_SIZE, weight: .semibold))
-                                .foregroundColor(Color("1F2020"))
-                        })
                     }
                 }
             }
@@ -201,7 +203,7 @@ struct GamePlayView: View {
         .fullScreenCover(isPresented: $isGamePointListShow, onDismiss: {
             
         }) {
-            
+            GameResultListView(selectedGameObjective: $selectedGameObjective, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
         }
         .ignoresSafeArea()
     }
