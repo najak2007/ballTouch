@@ -39,10 +39,18 @@ struct GamePlayView: View {
 #endif
             VStack {
                 HStack {
-                    Text(selectedGameObjective.id)
-                        .font(.custom("GmarketSansTTFBold", size: 16))
-                        .foregroundColor(Color("1F2020"))
-                    
+                    HStack(spacing: 5) {
+                        Text(selectedGameObjective.id)
+                            .font(.custom("GmarketSansTTFBold", size: 16))
+                            .foregroundColor(Color("1F2020"))
+                        
+                        
+                        if selectedGameObjective == .점수_맞추기 {
+                            Text(" 🎯\((savedScoreIndex + 1) * 10)점")
+                                .font(.custom("GmarketSansTTFBold", size: 18))
+                                .foregroundColor(Color("1F2020"))
+                        }
+                    }
                     Spacer()
                     
                     Text("\(score)")
@@ -116,7 +124,15 @@ struct GamePlayView: View {
                                         TapGesture(count: 1)
                                             .onEnded {
                                                 if balls[index].touched == false, gameState == .게임중 {
-                                                    score += balls[index].point
+                                                    if selectedGameObjective == .점수_맞추기 {
+                                                        if ((savedScoreIndex + 1) * 10) == balls[index].point {
+                                                            score += balls[index].point
+                                                        } else {
+                                                            score -= balls[index].point
+                                                        }
+                                                    } else {
+                                                        score += balls[index].point
+                                                    }
                                                     balls[index].touched = true
                                                     balls[index].isStopped = true
                                                     balls[index].isAnimating = true
