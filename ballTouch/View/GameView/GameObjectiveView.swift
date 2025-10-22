@@ -43,7 +43,7 @@ struct GameObjectiveView: View {
                         })
                     } else {
                         Button(action: {
-                            
+                            self.gamePlayMode = playMode
                         }, label: {
                             Text(playMode.id)
                                 .font(.custom("GmarketSansTTFMedium", size: 20))
