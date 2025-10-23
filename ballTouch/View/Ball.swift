@@ -23,10 +23,18 @@ struct Ball: Identifiable {
     
     init(in geometry: GeometryProxy, gameMode selectedGameObjective: GameObjective = .합산_점수, playMode gamePlayMode: GamePlayMode = .빗방울) {
         position = Ball.getRandomPosition(in: geometry)
-        size = CGFloat.random(in: 50...100)
-        color = .random
-        point = (Int.random(in: 1...10)) * 10
-        label = Text(String(point))
+        
+        if gamePlayMode == .빗방울 {
+            size = CGFloat.random(in: 50...100)
+            color = .random
+            point = (Int.random(in: 1...10)) * 10
+            label = Text(String(point))
+        } else {
+            size = 0
+            color = .clear
+            point = (Int.random(in: 1...10)) * 10
+            label = Text("")
+        }
         
         if selectedGameObjective == .합산_점수 {
             speed = CGFloat(Int.random(in: 5...15))
@@ -39,7 +47,16 @@ struct Ball: Identifiable {
     
     mutating func updatePosition(in geometry: GeometryProxy) {
         if !isStopped {
-            position = CGPoint(x: position.x, y: position.y + speed)
+            if playMode == .빗방울 {
+                position = CGPoint(x: position.x, y: position.y + speed)
+            } else {
+                if size == 0 {
+                    reproduceBall(geometry: geometry)
+                } else {
+                    size = 0
+                    label = Text("")
+                }
+            }
             
             if !isInside(geometry: geometry) {
                 reproduceBall(geometry: geometry)
@@ -48,7 +65,7 @@ struct Ball: Identifiable {
     }
     
     func isInside(geometry: GeometryProxy) -> Bool {
-        let minX = -size
+        let minX = -(size * 1.6)
         let maxX = geometry.size.width + size
         let minY = -size
         let maxY = geometry.size.height + size
@@ -57,7 +74,7 @@ struct Ball: Identifiable {
     }
     
     mutating func reproduceBall(geometry: GeometryProxy) {
-        position = Ball.getRandomPosition(in: geometry)
+        position = Ball.getRandomPosition(in: geometry, playMode: playMode)
         point = (Int.random(in: 1...10))*10
         size = CGFloat.random(in: 50...100)
         label = Text(String(point))
@@ -65,7 +82,16 @@ struct Ball: Identifiable {
         touched = false
     }
     
-    static func getRandomPosition(in geometry: GeometryProxy) -> CGPoint {
-        return CGPoint(x: CGFloat.random(in: 0...geometry.size.width), y: CGFloat.random(in: 0...geometry.size.height / 3))
+    mutating func setBallZeroSize() {
+        size = 0
+        label = Text("")
+        
+    }
+    
+    static func getRandomPosition(in geometry: GeometryProxy, playMode: GamePlayMode = .빗방울) -> CGPoint {
+        if playMode == .빗방울 {
+            return CGPoint(x: CGFloat.random(in: 0...geometry.size.width), y: CGFloat.random(in: 0...geometry.size.height / 3))
+        }
+        return CGPoint(x: CGFloat.random(in: 0...geometry.size.width), y: CGFloat.random(in: 0...geometry.size.height))
     }
 }

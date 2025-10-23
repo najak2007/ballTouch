@@ -14,7 +14,7 @@ struct GamePlayView: View {
     
     @State var balls: [Ball] = []
     @State var score: Int = 0
-    let ballCount = 7
+    @State var ballCount = 7
     
     @Binding var selectedGameObjective: GameObjective
     @Binding var gamePlayMode: GamePlayMode
@@ -133,6 +133,7 @@ struct GamePlayView: View {
                                                     } else {
                                                         score += balls[index].point
                                                     }
+#if __NOT_USE__
                                                     balls[index].touched = true
                                                     balls[index].isStopped = true
                                                     balls[index].isAnimating = true
@@ -141,6 +142,15 @@ struct GamePlayView: View {
                                                         balls[index].isStopped = false
                                                         balls[index].isAnimating = false
                                                     }
+#else
+                                                    if gamePlayMode == .빗방울 {
+                                                        balls[index].reproduceBall(geometry: geometry)
+                                                    } else {
+                                                    
+                                                    }
+                                                    balls[index].isStopped = false
+                                                    balls[index].isAnimating = false
+#endif
                                                 }
                                             }
                                     )
@@ -150,10 +160,7 @@ struct GamePlayView: View {
                         }
                     }
                     .onAppear {
-                        for _ in 0..<ballCount {
-                            balls.append(Ball(in: geometry))
-                        }
-                        
+                        ballSetting(geometry: geometry)
                         startTimer(geometry: geometry, playingTime: (savedTimeIndex + 1) * 10)
                     }
                     .onDisappear {
@@ -172,7 +179,7 @@ struct GamePlayView: View {
         }
         .overlay {
             ZStack(alignment: .center) {
-                Color.black.opacity(0.2).opacity(isGameResultShow ? 1: 0)
+                Color.black.opacity(0.6).opacity(isGameResultShow ? 1: 0)
                     .onTapGesture {
 #if __NOT_USE__
                         self.isGameResultShow.toggle()
@@ -180,7 +187,10 @@ struct GamePlayView: View {
                     }
                 
                 if self.isGameResultShow == true {
-                    VStack(spacing: 100) {
+                    VStack {
+                        
+                        Spacer()
+                        
                         HStack(spacing: 50) {
                             Button(action: {
                                 self.isGameResultShow.toggle()
@@ -201,16 +211,14 @@ struct GamePlayView: View {
                                     .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
                                     .foregroundColor(Color("1F2020"))
                             })
-                            
-                            Button(action: {
-                                dismiss()
-                            }, label: {
-                                Image(systemName: "rectangle.portrait.and.arrow.forward")
-                                    .resizable()
-                                    .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
-                                    .foregroundColor(Color("1F2020"))
-                            })
                         }
+                        
+                        Spacer()
+                        
+                        RoundedButton(title: "종료", action: {
+                            dismiss()
+                        })
+                        .padding(.bottom, 50)
                     }
                 }
             }
@@ -220,6 +228,9 @@ struct GamePlayView: View {
             
         }) {
             GameResultListView(selectedGameObjective: $selectedGameObjective, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
+        }
+        .onAppear {
+            self.ballCount = gamePlayMode == .빗방울 ? 7 : 3
         }
         .ignoresSafeArea()
     }
@@ -243,8 +254,8 @@ struct GamePlayView: View {
     
     func startTimer(geometry: GeometryProxy, isInit: Bool = true, playingTime: Int) {
         currentGeometry = geometry
-        gamePlayTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-            for i in 0..<balls.count {
+        gamePlayTimer = Timer.scheduledTimer(withTimeInterval: gamePlayMode == .빗방울 ? 0.05 : CGFloat.random(in: 1...1.5), repeats: true) { _ in
+            for i in 0..<ballCount {
                 balls[i].updatePosition(in: geometry)
             }
         }
@@ -301,10 +312,7 @@ struct GamePlayView: View {
     
     func reGameStart() {
         if let geometry = currentGeometry {
-            for _ in 0..<ballCount {
-                balls.append(Ball(in: geometry))
-            }
-
+            ballSetting(geometry: geometry)
             startTimer(geometry: geometry, playingTime: (savedTimeIndex + 1) * 10)
         }
     }
@@ -313,5 +321,11 @@ struct GamePlayView: View {
     func getPlayingTime(_ fromDate: Date, _ toDate: Date = Date()) -> Int {
         let timeGap = Calendar.current.dateComponents([.second], from: fromDate, to: toDate)
         return timeGap.second ?? 0
+    }
+    
+    func ballSetting(geometry: GeometryProxy) {
+        for _ in 0..<ballCount {
+            balls.append(Ball(in: geometry, playMode: gamePlayMode))
+        }
     }
 }
