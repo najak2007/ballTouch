@@ -45,13 +45,13 @@ struct Ball: Identifiable {
         playMode = gamePlayMode
     }
     
-    mutating func updatePosition(in geometry: GeometryProxy) {
+    mutating func updatePosition(in geometry: GeometryProxy, ballIndex: Int = 0) {
         if !isStopped {
             if playMode == .빗방울 {
                 position = CGPoint(x: position.x, y: position.y + speed)
             } else {
                 if size == 0 {
-                    reproduceBall(geometry: geometry)
+                    reproduceBall(geometry: geometry, ballIndex: ballIndex)
                 } else {
                     size = 0
                     label = Text("")
@@ -73,9 +73,22 @@ struct Ball: Identifiable {
         return (minX...maxX).contains(position.x) && (minY...maxY).contains(position.y)
     }
     
-    mutating func reproduceBall(geometry: GeometryProxy) {
+    mutating func reproduceBall(geometry: GeometryProxy, ballIndex: Int = 0) {
         position = Ball.getRandomPosition(in: geometry, playMode: playMode)
-        point = (Int.random(in: 1...10))*10
+        if playMode == .빗방울 {
+            point = (Int.random(in: 1...10))*10
+        } else if playMode == .두더지 {
+            switch (ballIndex % Config.GAME_PLAY_MODE_MOLE_COUNT) {
+            case 0:
+                point = (Int.random(in: 1...4))*10
+            case 1:
+                point = (Int.random(in: 5...7))*10
+            case 2:
+                point = (Int.random(in: 8...10))*10
+            default:
+                point = (Int.random(in: 1...10))*10
+            }
+        }
         size = CGFloat.random(in: 50...100)
         label = Text(String(point))
         color = .random
@@ -83,9 +96,10 @@ struct Ball: Identifiable {
     }
     
     mutating func setBallZeroSize() {
-        size = 0
-        label = Text("")
-        
+        if playMode == .두더지 {
+            size = 0
+            label = Text("")
+        }
     }
     
     static func getRandomPosition(in geometry: GeometryProxy, playMode: GamePlayMode = .빗방울) -> CGPoint {

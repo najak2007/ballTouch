@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 enum GameObjective: String, CaseIterable, Identifiable, Decodable, Encodable {
     case 합산_점수
@@ -30,5 +31,23 @@ enum GamePlayMode: String, CaseIterable, Identifiable, Decodable, Encodable {
 
     var id: String {
         return rawValue
+    }
+}
+
+class GameResultData: Object {
+    dynamic var date: Date = Date()
+    dynamic var gameGroupID: String = ""
+    dynamic var score: Int = 0
+    dynamic var gamePlayMode: GamePlayMode = .빗방울
+    dynamic var gamePlaySecond: Int = 10
+    dynamic var playName: String = ""
+    
+    init(date: Date, gameGroupID: String, score: Int, gamePlayMode: GamePlayMode, gamePlaySecond: Int, playName: String = "") {
+        self.date = date
+        self.gameGroupID = gameGroupID
+        self.score = score
+        self.gamePlayMode = gamePlayMode
+        self.gamePlaySecond = gamePlaySecond
+        self.playName = playName
     }
 }

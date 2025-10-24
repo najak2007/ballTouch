@@ -55,6 +55,7 @@ struct GameObjectiveView: View {
                 }
             }
             
+#if __NOT_USE__
             Section(header: GameListHeaderView(headerText: "Game 점수", showAlignments: .좌측정렬)) {
                 ForEach(GameObjective.allCases) { objective in
                     if objective == .합산_점수 || objective == .점수_맞추기 {
@@ -137,6 +138,7 @@ struct GameObjectiveView: View {
                     }
                 }
             }
+#endif
             Section(header: GameListHeaderView(headerText: "Game 시간", showAlignments: .좌측정렬)) {
                 Button(action: {
                 }, label: {
