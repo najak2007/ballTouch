@@ -14,4 +14,9 @@ class Config {
     static let INPUT_VIEW_HEADER_FONT_SIZE: CGFloat = 14
     static let GAME_RESULT_VIEW_FINISH_DELAY: Double = 0.8
     
+    static let GAME_PLAY_MODE_RAIN_DROP_COUNT: Int = 7
+    static let GAME_PLAY_MODE_MOLE_COUNT: Int = 3
+    
+    static let GAME_PLAY_MODE_ICON_SIZE: CGFloat = 45
+    
 }

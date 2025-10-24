@@ -14,8 +14,9 @@ struct GamePlayView: View {
     
     @State var balls: [Ball] = []
     @State var score: Int = 0
-    let ballCount = 7
+    @State var ballCount = 7
     
+    @State var gameGroupID: String = ""
     @Binding var selectedGameObjective: GameObjective
     @Binding var gamePlayMode: GamePlayMode
     @Binding var savedScoreIndex: Int
@@ -31,7 +32,8 @@ struct GamePlayView: View {
     @State private var gameCountTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var isGameResultShow: Bool = false
     @State private var isGamePointListShow: Bool = false
-
+ 
+    @ObservedObject var gameViewModel = GameViewModel()
 
     var body: some View {
         ZStack {
@@ -133,6 +135,7 @@ struct GamePlayView: View {
                                                     } else {
                                                         score += balls[index].point
                                                     }
+#if __NOT_USE__
                                                     balls[index].touched = true
                                                     balls[index].isStopped = true
                                                     balls[index].isAnimating = true
@@ -141,6 +144,17 @@ struct GamePlayView: View {
                                                         balls[index].isStopped = false
                                                         balls[index].isAnimating = false
                                                     }
+#else
+                                                    if gamePlayMode == .빗방울 {
+                                                        balls[index].reproduceBall(geometry: geometry)
+                                                    } else {
+                                                        for i in 0..<ballCount {
+                                                            balls[i].setBallZeroSize()
+                                                        }
+                                                    }
+                                                    balls[index].isStopped = false
+                                                    balls[index].isAnimating = false
+#endif
                                                 }
                                             }
                                     )
@@ -150,10 +164,7 @@ struct GamePlayView: View {
                         }
                     }
                     .onAppear {
-                        for _ in 0..<ballCount {
-                            balls.append(Ball(in: geometry))
-                        }
-                        
+                        ballSetting(geometry: geometry)
                         startTimer(geometry: geometry, playingTime: (savedTimeIndex + 1) * 10)
                     }
                     .onDisappear {
@@ -167,12 +178,13 @@ struct GamePlayView: View {
                 if getPlayingTime(Date(), endDate) < 0 {
                     self.finishGame()
                     gameCountTimer.upstream.connect().cancel()
+                    self.gameResultSave()
                 }
             }
         }
         .overlay {
             ZStack(alignment: .center) {
-                Color.black.opacity(0.2).opacity(isGameResultShow ? 1: 0)
+                Color.black.opacity(0.6).opacity(isGameResultShow ? 1: 0)
                     .onTapGesture {
 #if __NOT_USE__
                         self.isGameResultShow.toggle()
@@ -180,50 +192,77 @@ struct GamePlayView: View {
                     }
                 
                 if self.isGameResultShow == true {
-                    VStack(spacing: 100) {
-                        HStack(spacing: 50) {
-                            Button(action: {
-                                self.isGameResultShow.toggle()
-                                self.isGamePointListShow.toggle()
-                            }, label: {
-                                Image(systemName: "list.number")
-                                    .resizable()
-                                    .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
-                                    .foregroundColor(Color("1F2020"))
-                            })
-
-                            Button(action: {
-                                self.isGameResultShow.toggle()
-                                self.reGameStart()
-                            }, label: {
-                                Image(systemName: "repeat.circle.fill")
-                                    .resizable()
-                                    .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
-                                    .foregroundColor(Color("1F2020"))
-                            })
-                            
-                            Button(action: {
-                                dismiss()
-                            }, label: {
-                                Image(systemName: "rectangle.portrait.and.arrow.forward")
-                                    .resizable()
-                                    .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
-                                    .foregroundColor(Color("1F2020"))
-                            })
+                    VStack {
+                        Spacer()
+                        
+                        HStack(spacing: 80) {
+                            if score == 0 {
+                                Button(action: {
+                                    self.isGameResultShow.toggle()
+                                    self.reGameStart()
+                                }, label: {
+                                    Image(systemName: "repeat.circle.fill")
+                                        .resizable()
+                                        .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                                        .foregroundColor(.white)
+                                })
+                            } else {
+                                Button(action: {
+                                    self.isGamePointListShow.toggle()
+                                }, label: {
+                                    Image(systemName: "list.number")
+                                        .resizable()
+                                        .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                                        .foregroundColor(.white)
+                                })
+                                
+                                Button(action: {
+                                    self.isGameResultShow.toggle()
+                                    self.reGameStart()
+                                }, label: {
+                                    Image(systemName: "repeat.circle.fill")
+                                        .resizable()
+                                        .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                                        .foregroundColor(.white)
+                                })
+                            }
                         }
+                        
+                        Spacer()
+                        
+                        RoundedButton(title: "나가기", action: {
+                            dismiss()
+                        })
+                        .padding(.bottom, 50)
                     }
                 }
             }
             .padding(.top, 50)
         }
         .fullScreenCover(isPresented: $isGamePointListShow, onDismiss: {
-            
+
         }) {
-            GameResultListView(selectedGameObjective: $selectedGameObjective, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
+            GameResultListView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
+        }
+        .onAppear {
+            self.ballCount = gamePlayMode == .빗방울 ? Config.GAME_PLAY_MODE_RAIN_DROP_COUNT : Config.GAME_PLAY_MODE_MOLE_COUNT
+            
         }
         .ignoresSafeArea()
     }
     
+    func gameResultSave() {
+        if score > 0 {
+            let gameResultData = GameResultData(
+                            date: Date(),
+                            gameGroupID: gameGroupID,
+                            score: score,
+                            gamePlayMode: gamePlayMode,
+                            gamePlaySecond: savedTimeIndex * 10,
+                            playName: "")
+            gameViewModel.gameResultAdd(resultData: gameResultData)
+        }
+    }
     
     func gameConfiguration(_ isInit: Bool = true, _ playingTime: Int) {
 #if true
@@ -243,9 +282,9 @@ struct GamePlayView: View {
     
     func startTimer(geometry: GeometryProxy, isInit: Bool = true, playingTime: Int) {
         currentGeometry = geometry
-        gamePlayTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-            for i in 0..<balls.count {
-                balls[i].updatePosition(in: geometry)
+        gamePlayTimer = Timer.scheduledTimer(withTimeInterval: gamePlayMode == .빗방울 ? 0.05 : CGFloat.random(in: 0.8...1.3), repeats: true) { _ in
+            for i in 0..<ballCount {
+                balls[i].updatePosition(in: geometry, ballIndex: i)
             }
         }
         gameState = .게임중
@@ -301,10 +340,7 @@ struct GamePlayView: View {
     
     func reGameStart() {
         if let geometry = currentGeometry {
-            for _ in 0..<ballCount {
-                balls.append(Ball(in: geometry))
-            }
-
+            ballSetting(geometry: geometry)
             startTimer(geometry: geometry, playingTime: (savedTimeIndex + 1) * 10)
         }
     }
@@ -313,5 +349,11 @@ struct GamePlayView: View {
     func getPlayingTime(_ fromDate: Date, _ toDate: Date = Date()) -> Int {
         let timeGap = Calendar.current.dateComponents([.second], from: fromDate, to: toDate)
         return timeGap.second ?? 0
+    }
+    
+    func ballSetting(geometry: GeometryProxy) {
+        for _ in 0..<ballCount {
+            balls.append(Ball(in: geometry, playMode: gamePlayMode))
+        }
     }
 }

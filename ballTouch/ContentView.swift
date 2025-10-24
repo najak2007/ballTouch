@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct ContentView: View {
     @State private var gameStartButtonSize: CGFloat = Config.GAME_START_BUTTON_SIZE
@@ -23,7 +24,8 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 HStack {
-                    HStack(spacing: 5) {
+                    HStack(spacing: 1) {
+#if __NOT_USE__
                         Text(selectedGameObjective.id)
                             .font(.custom("GmarketSansTTFBold", size: 16))
                             .foregroundColor(Color("1F2020"))
@@ -33,6 +35,15 @@ struct ContentView: View {
                                 .font(.custom("GmarketSansTTFBold", size: 18))
                                 .foregroundColor(Color("1F2020"))
                         }
+#else
+                        Text(gamePlayMode.id)
+                            .font(.custom("GmarketSansTTFBold", size: 16))
+                            .foregroundColor(Color("1F2020"))
+                        
+                        Image(gamePlayMode == .빗방울 ? "game_play_rain" : "game_play_mole")
+                            .resizable()
+                            .frame(width: Config.GAME_PLAY_MODE_ICON_SIZE, height: Config.GAME_PLAY_MODE_ICON_SIZE)
+#endif
                     }
                     
                     Spacer()
@@ -99,7 +110,7 @@ struct ContentView: View {
                     }
                 
                 if self.isGameObjectiveShow {
-                    BottomSheetView($isGameObjectiveShow, height: 550) {
+                    BottomSheetView($isGameObjectiveShow, height: 350) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
                         VStack {
                             GameObjectiveView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex) { objectiveItem, objectiveValue in
                                 self.selectedGameObjective = objectiveItem
@@ -114,7 +125,7 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $isGameStart, onDismiss: {
             
         }) {
-            GamePlayView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
+            GamePlayView(gameGroupID: UUID().uuidString, selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
         }
         .transaction { transaction in
             transaction.disablesAnimations = true
