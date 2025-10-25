@@ -23,7 +23,6 @@ struct BottomSheetView<Content>: View where Content: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            
             Color.black.opacity(0.1)
                 .opacity(isPresented ? 1 : 0)
                 .onTapGesture {

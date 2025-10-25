@@ -6,25 +6,92 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct ContentView: View {
     @State private var gameStartButtonSize: CGFloat = Config.GAME_START_BUTTON_SIZE
     @State private var isGameStart: Bool = false
     @State private var isGameObjectiveShow: Bool = false
     @State private var selectedGameObjective: GameObjective = .합산_점수
+    @State private var gamePlayMode: GamePlayMode = .빗방울
     @State private var isObjectiveInputViewShow: Bool = false
     @State private var selectedScore: Int = 50
+    @State private var savedScoreIndex: Int = 4
+    @State private var savedTimeIndex: Int = 2
+
     
     var body: some View {
         NavigationView {
             VStack {
+                HStack {
+                    HStack(spacing: 1) {
+#if __NOT_USE__
+                        Text(selectedGameObjective.id)
+                            .font(.custom("GmarketSansTTFBold", size: 16))
+                            .foregroundColor(Color("1F2020"))
+                        
+                        if selectedGameObjective == .점수_맞추기 {
+                            Text(" 🎯\((savedScoreIndex + 1) * 10)점")
+                                .font(.custom("GmarketSansTTFBold", size: 18))
+                                .foregroundColor(Color("1F2020"))
+                        }
+#else
+                        Text(gamePlayMode.id)
+                            .font(.custom("GmarketSansTTFBold", size: 16))
+                            .foregroundColor(Color("1F2020"))
+                        
+                        Image(gamePlayMode == .빗방울 ? "game_play_rain" : "game_play_mole")
+                            .resizable()
+                            .frame(width: Config.GAME_PLAY_MODE_ICON_SIZE, height: Config.GAME_PLAY_MODE_ICON_SIZE)
+#endif
+                    }
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 5) {
+                        Image(systemName: "timer.circle")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                            
+#if true
+                        Menu(selectionIndex: $savedTimeIndex) { selectionIndex in
+                            savedTimeIndex = selectionIndex
+                        }.frame(width: 50, height: 25)
+#else
+                        Menu("안녕" /*"\((savedTimeIndex + 1) * 10)초" */) {
+                            ForEach(0..<10) { number in
+                                Button(action: {
+                                    savedTimeIndex = number
+                                }, label: {
+                                    Text("\((number + 1) * 10)초")
+                                        .font(.custom("GmarketSansTTFBold", size: 16))
+                                        .foregroundColor(Color("1F2020"))
+                                })
+                            }
+                        }
+                        .font(.custom("GmarketSansTTFMedium", size: 14))
+                        .foregroundColor(Color("1F2020").opacity(06))
+#endif
+                    }
+                }
+                .frame(height: Config.NAVIGATION_HEIGHT)
+                .padding(.horizontal, 20)
+ 
+                
                 Spacer()
-                ImageCircleButton(uiImage: UIImage(systemName: "gamecontroller")! as UIImage, size: $gameStartButtonSize, action: {
+                
+                Button(action: {
                     isGameStart.toggle()
                     HapticManager.instance.notification(type: .success)
+                }, label: {
+                    Image(systemName: "play.square.fill")
+                        .resizable()
+                        .frame(width: Config.GAME_START_BUTTON_SIZE, height: Config.GAME_START_BUTTON_SIZE)
+                        .foregroundColor(Color("1F2020"))
                 })
                 
                 Spacer()
+
                 RoundedButton(title: "Game 설정", action: {
                     isGameObjectiveShow.toggle()
                 })
@@ -43,23 +110,26 @@ struct ContentView: View {
                     }
                 
                 if self.isGameObjectiveShow {
-                    BottomSheetView($isGameObjectiveShow, height: 300) {
+                    BottomSheetView($isGameObjectiveShow, height: 350) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
                         VStack {
-                            GameObjectiveView { objectiveItem in
+                            GameObjectiveView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex) { objectiveItem, objectiveValue in
                                 self.selectedGameObjective = objectiveItem
                                 self.isGameObjectiveShow.toggle()
-                                // self.isObjectiveInputViewShow.toggle()
-                                Picker("\(self.selectedGameObjective.id )", selection: $selectedScore) {
-                                    ForEach(50..<500) { number in
-                                        Text("\(number)").tag(number as Int)
-                                    }
-                                }
-                                .pickerStyle(.wheel)
+
                             }
                         }
                     }
                 }
             }
         }
+        .fullScreenCover(isPresented: $isGameStart, onDismiss: {
+            
+        }) {
+            GamePlayView(gameGroupID: UUID().uuidString, selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
+        }
+        .transaction { transaction in
+            transaction.disablesAnimations = true
+        }
+        .ignoresSafeArea()
     }
 }
