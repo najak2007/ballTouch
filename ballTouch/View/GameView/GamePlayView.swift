@@ -258,7 +258,7 @@ struct GamePlayView: View {
                             gameGroupID: gameGroupID,
                             score: score,
                             gamePlayMode: gamePlayMode,
-                            gamePlaySecond: savedTimeIndex * 10,
+                            gamePlaySecond: ((savedTimeIndex + 1) * 10),
                             playName: "")
             gameViewModel.gameResultAdd(resultData: gameResultData)
         }
