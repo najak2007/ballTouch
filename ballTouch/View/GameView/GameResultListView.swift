@@ -20,6 +20,9 @@ struct GameResultListView: View {
     
     @State private var pointTableIndex: Int = 0
     
+    @ObservedObject var gameViewModel = GameViewModel()
+    @State private var gameResultDatas: [GameResultData] = []
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 40) {
@@ -52,10 +55,16 @@ struct GameResultListView: View {
                         }
                         .pickerStyle(.segmented)
                         .tint(Color("1F2020"))
+                        .onChange(of: pointTableIndex) { newValue in
+                            self.fetchGameResultData(playMode: self.gamePlayMode, playTimeIndex: newValue)
+                        }
                         .onAppear {
                             self.pointTableIndex = savedTimeIndex
                         }
 #endif
+                        ForEach(0..<self.gameResultDatas.count * 50) { index in
+                            Text("\(String(format: "%02d", index)).  점수 : \(self.gameResultDatas[0].score)")
+                        }
                     }
                 }
                 Spacer()
@@ -86,6 +95,12 @@ struct GameResultListView: View {
                 }
             }
         }
-
+        .onAppear {
+            fetchGameResultData(playMode: gamePlayMode, playTimeIndex: pointTableIndex)
+        }
+    }
+    
+    func fetchGameResultData(playMode: GamePlayMode, playTimeIndex: Int) {
+        self.gameResultDatas = gameViewModel.fetchGamePlayModeResultData(playMode: playMode, playTime: ((playTimeIndex + 1) * 10))
     }
 }
