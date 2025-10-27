@@ -7,6 +7,7 @@
 
 import Foundation
 import RealmSwift
+internal import Realm
 
 enum GameObjective: String, CaseIterable, Identifiable, Decodable, Encodable {
     case 합산_점수
@@ -34,13 +35,23 @@ enum GamePlayMode: String, CaseIterable, Identifiable, Decodable, Encodable {
     }
 }
 
-class GameResultData: Object {
-    dynamic var date: Date = Date()
-    dynamic var gameGroupID: String = ""
-    dynamic var score: Int = 0
+enum InputTypeError {
+    case 이름_글자갯수
+    case 이름_미입력
+}
+
+class GameResultData: Object, Comparable {
+    @objc dynamic var date: Date = Date()
+    @objc dynamic var gameGroupID: String = ""
+    @objc dynamic var score: Int = 0
     dynamic var gamePlayMode: GamePlayMode = .빗방울
-    dynamic var gamePlaySecond: Int = 10
-    dynamic var playName: String = ""
+    @objc dynamic var gamePlaySecond: Int = 10
+    @objc dynamic var playName: String = ""
+    @objc dynamic var isShow: Bool = false
+    
+    override init() {
+        super.init()
+    }
     
     init(date: Date, gameGroupID: String, score: Int, gamePlayMode: GamePlayMode, gamePlaySecond: Int, playName: String = "") {
         self.date = date
@@ -49,5 +60,10 @@ class GameResultData: Object {
         self.gamePlayMode = gamePlayMode
         self.gamePlaySecond = gamePlaySecond
         self.playName = playName
+        self.isShow = false
+    }
+    
+    static func < (lhs: GameResultData, rhs: GameResultData) -> Bool {
+        return lhs.score < rhs.score
     }
 }

@@ -34,6 +34,8 @@ struct GamePlayView: View {
     @State private var isGamePointListShow: Bool = false
  
     @ObservedObject var gameViewModel = GameViewModel()
+    
+    @State private var scrollPosition: Int = 0
 
     var body: some View {
         ZStack {
@@ -242,7 +244,7 @@ struct GamePlayView: View {
         .fullScreenCover(isPresented: $isGamePointListShow, onDismiss: {
 
         }) {
-            GameResultListView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex)
+            GameResultListView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex, scrollPosition: $scrollPosition)
         }
         .onAppear {
             self.ballCount = gamePlayMode == .빗방울 ? Config.GAME_PLAY_MODE_RAIN_DROP_COUNT : Config.GAME_PLAY_MODE_MOLE_COUNT
@@ -258,9 +260,9 @@ struct GamePlayView: View {
                             gameGroupID: gameGroupID,
                             score: score,
                             gamePlayMode: gamePlayMode,
-                            gamePlaySecond: savedTimeIndex * 10,
+                            gamePlaySecond: ((savedTimeIndex + 1) * 10),
                             playName: "")
-            gameViewModel.gameResultAdd(resultData: gameResultData)
+            self.scrollPosition = gameViewModel.gameResultAdd(resultData: gameResultData)
         }
     }
     

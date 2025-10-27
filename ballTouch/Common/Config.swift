@@ -19,4 +19,6 @@ class Config {
     
     static let GAME_PLAY_MODE_ICON_SIZE: CGFloat = 45
     
+    static let GAME_RESULT_DATA_MAX_COUNT: Int = 1000
+    static let GAME_PLAYER_NAME_COUNT: Int = 15
 }
