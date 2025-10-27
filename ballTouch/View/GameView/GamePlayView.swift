@@ -263,6 +263,7 @@ struct GamePlayView: View {
                             gamePlaySecond: ((savedTimeIndex + 1) * 10),
                             playName: "")
             self.scrollPosition = gameViewModel.gameResultAdd(resultData: gameResultData)
+            self.scrollPosition = 19
         }
     }
     
