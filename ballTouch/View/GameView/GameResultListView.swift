@@ -26,11 +26,45 @@ struct GameResultListView: View {
     @State private var tableCount: Int = 0
     @State private var toast: Toast? = nil
     
-    @State var position = ScrollPosition(edge: .bottom)
+    @State private var currentVisibleItem: GameResultData?
     
     var body: some View {
         NavigationView {
             VStack(spacing: 40) {
+#if true
+                Picker("", selection: $scoreTableIndex) {
+                    ForEach(1..<7) { secondValue in
+                        Text("\(secondValue * 10) 초")
+                    }
+                }
+                .pickerStyle(.segmented)
+                .tint(Color("1F2020"))
+                .onChange(of: scoreTableIndex) { oldValue, newValue in
+                    if oldValue != newValue {
+                        self.fetchGameResultData(playMode: self.gamePlayMode, playTimeIndex: newValue)
+                    }
+                }
+                .onAppear {
+                    self.scoreTableIndex = savedTimeIndex
+                }
+                
+                ScrollView {
+                    LazyVStack {
+                        ForEach(0..<tableCount, id:\.self) { index in
+                            GameScoreRowView(gameResultData: self.gameResultDatas[index], rankIndex: (index + 1),  inputHandler: { (gameResultData, playName) in
+                                gameViewModel.setGameResultForPlayNameUpdate(resultData: gameResultData, playName: playName) { isCompletion in
+                                    fetchGameResultData(playMode: gamePlayMode, playTimeIndex: scoreTableIndex)
+                                }
+                            }, inputErrorHandler: { errorType in
+                                inputErrorHandler(errorType)
+                            })
+                            .id(index)
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+                .scrollPosition(id: $currentVisibleItem, anchor: .bottom)
+#else
                 List {
                     Section {
 #if __NOT_USE__
@@ -81,7 +115,7 @@ struct GameResultListView: View {
                         }
                     }
                 }
-                .scrollPosition($position)
+#endif
             }
             .navigationTitle("점수")
             .navigationBarTitleDisplayMode(.inline)
@@ -111,7 +145,6 @@ struct GameResultListView: View {
         }
         .onAppear {
             fetchGameResultData(playMode: gamePlayMode, playTimeIndex: scoreTableIndex)
-            position.scrollTo(id: scrollPosition)
         }
     }
     
