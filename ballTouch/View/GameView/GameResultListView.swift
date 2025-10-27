@@ -17,20 +17,25 @@ struct GameResultListView: View {
     @Binding var score: Int
     @Binding var savedScoreIndex: Int
     @Binding var savedTimeIndex: Int
+    @Binding var scrollPosition: Int
     
-    @State private var pointTableIndex: Int = 0
+    @State private var scoreTableIndex: Int = 0
     
     @ObservedObject var gameViewModel = GameViewModel()
     @State private var gameResultDatas: [GameResultData] = []
+    @State private var tableCount: Int = 0
+    @State private var toast: Toast? = nil
+    
+    @State var position = ScrollPosition(edge: .bottom)
     
     var body: some View {
         NavigationView {
             VStack(spacing: 40) {
-                Form {
+                List {
                     Section {
 #if __NOT_USE__
                         if self.selectedGameObjective == .합산_점수 {
-                            Picker("", selection: $pointTableIndex) {
+                            Picker("", selection: $scoreTableIndex) {
                                 if self.selectedGameObjective == .합산_점수 {
                                     ForEach(1..<7) { tableValue in
                                         Text("\(tableValue) 초")
@@ -39,7 +44,7 @@ struct GameResultListView: View {
                             }
                             .pickerStyle(.segmented)
                         } else {
-                            Picker("", selection: $pointTableIndex) {
+                            Picker("", selection: $scoreTableIndex) {
                                 ForEach(1..<11) { tableValue in
                                     Text("\(tableValue) 초")
                                 }
@@ -48,26 +53,35 @@ struct GameResultListView: View {
                             .tint(Color("1F2020"))
                         }
 #else
-                        Picker("", selection: $pointTableIndex) {
+                        Picker("", selection: $scoreTableIndex) {
                             ForEach(1..<7) { secondValue in
                                 Text("\(secondValue * 10) 초")
                             }
                         }
                         .pickerStyle(.segmented)
                         .tint(Color("1F2020"))
-                        .onChange(of: pointTableIndex) { newValue in
-                            self.fetchGameResultData(playMode: self.gamePlayMode, playTimeIndex: newValue)
+                        .onChange(of: scoreTableIndex) { oldValue, newValue in
+                            if oldValue != newValue {
+                                self.fetchGameResultData(playMode: self.gamePlayMode, playTimeIndex: newValue)
+                            }
                         }
                         .onAppear {
-                            self.pointTableIndex = savedTimeIndex
+                            self.scoreTableIndex = savedTimeIndex
                         }
 #endif
-                        ForEach(0..<self.gameResultDatas.count * 50) { index in
-                            Text("\(String(format: "%02d", index)).  점수 : \(self.gameResultDatas[0].score)")
+                        ForEach(0..<tableCount, id:\.self) { index in
+                            GameScoreRowView(gameResultData: self.gameResultDatas[index], rankIndex: (index + 1),  inputHandler: { (gameResultData, playName) in
+                                gameViewModel.setGameResultForPlayNameUpdate(resultData: gameResultData, playName: playName) { isCompletion in
+                                    fetchGameResultData(playMode: gamePlayMode, playTimeIndex: scoreTableIndex)
+                                }
+                            }, inputErrorHandler: { errorType in
+                                inputErrorHandler(errorType)
+                            })
+                            .id(index)
                         }
                     }
                 }
-                Spacer()
+               // .scrollPosition($position)
             }
             .navigationTitle("점수")
             .navigationBarTitleDisplayMode(.inline)
@@ -96,11 +110,22 @@ struct GameResultListView: View {
             }
         }
         .onAppear {
-            fetchGameResultData(playMode: gamePlayMode, playTimeIndex: pointTableIndex)
+            fetchGameResultData(playMode: gamePlayMode, playTimeIndex: scoreTableIndex)
+            position.scrollTo(id: scrollPosition)
         }
     }
     
     func fetchGameResultData(playMode: GamePlayMode, playTimeIndex: Int) {
         self.gameResultDatas = gameViewModel.fetchGamePlayModeResultData(playMode: playMode, playTime: ((playTimeIndex + 1) * 10))
+        self.tableCount = self.gameResultDatas.count
+    }
+    
+    func inputErrorHandler(_ inputError: InputTypeError) {
+        switch inputError {
+        case .이름_글자갯수:
+            toast = Toast(type: .error, title: "", message: "이름은 \(Config.GAME_PLAYER_NAME_COUNT)자 이내로 입력해주세요.")
+        case .이름_미입력:
+            toast = Toast(type: .error, title: "", message: "1글자 이상 입력해주세요.")
+        }
     }
 }
