@@ -81,7 +81,7 @@ struct GameResultListView: View {
                         }
                     }
                 }
-               // .scrollPosition($position)
+                .scrollPosition($position)
             }
             .navigationTitle("점수")
             .navigationBarTitleDisplayMode(.inline)
