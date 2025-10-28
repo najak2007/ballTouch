@@ -36,6 +36,7 @@ class GameViewModel: NSObject, ObservableObject {
     func gameResultAdd(resultData gameResultData: GameResultData) -> Int {
         guard let realm = realm else { return 0 }
         
+        
         let results = realm.objects(GameResultData.self)
         gameResultDataArr = Array(results).sorted { $0.score > $1.score }
         
@@ -43,20 +44,28 @@ class GameViewModel: NSObject, ObservableObject {
             setGameResultDataDelete(resultData: gameResultDataArr.last)
         }
         
+        var searchIndex: Int = 0
+        
         do {
             try realm.write {
                 realm.add(gameResultData)
                 fetchGameResultDatas()
                 
-                if let addIndex = gameResultDataArr.firstIndex(of: gameResultData) {
-                    return addIndex
+                for index in 0..<gameResultDataArr.count {
+                    let gameItem = gameResultDataArr[index]
+                    if gameItem.date == gameResultData.date,
+                        gameItem.gameGroupID == gameResultData.gameGroupID,
+                        gameItem.score == gameResultData.score {
+                        searchIndex = index
+                        break
+                    }
                 }
-                return 0
             }
         } catch {
-        
+            return 0
         }
-        return 0
+        
+        return searchIndex
     }
     
     func setGameResultDataDelete(resultData: GameResultData?) {

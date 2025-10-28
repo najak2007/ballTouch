@@ -36,6 +36,7 @@ struct GamePlayView: View {
     @ObservedObject var gameViewModel = GameViewModel()
     
     @State private var scrollPosition: Int = 0
+    @State var addGameResultDatas: [GameResultData] = []
 
     var body: some View {
         ZStack {
@@ -127,7 +128,7 @@ struct GamePlayView: View {
                                     .gesture(
                                         TapGesture(count: 1)
                                             .onEnded {
-                                                if balls[index].touched == false, gameState == .게임중 {
+                                                if  gameState == .게임중, balls.count > index, balls[index].touched == false {
                                                     if selectedGameObjective == .점수_맞추기 {
                                                         if ((savedScoreIndex + 1) * 10) == balls[index].point {
                                                             score += 1
@@ -242,9 +243,10 @@ struct GamePlayView: View {
             .padding(.top, 50)
         }
         .fullScreenCover(isPresented: $isGamePointListShow, onDismiss: {
-
+            addGameResultDatas.removeAll()
+            self.scrollPosition = 0
         }) {
-            GameResultListView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex, scrollPosition: $scrollPosition)
+            GameResultListView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, score: $score, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex, scrollPosition: $scrollPosition, addGameResultDatas: addGameResultDatas)
         }
         .onAppear {
             self.ballCount = gamePlayMode == .빗방울 ? Config.GAME_PLAY_MODE_RAIN_DROP_COUNT : Config.GAME_PLAY_MODE_MOLE_COUNT
@@ -263,7 +265,7 @@ struct GamePlayView: View {
                             gamePlaySecond: ((savedTimeIndex + 1) * 10),
                             playName: "")
             self.scrollPosition = gameViewModel.gameResultAdd(resultData: gameResultData)
-            self.scrollPosition = 19
+            self.addGameResultDatas.append(gameResultData)
         }
     }
     
@@ -302,10 +304,10 @@ struct GamePlayView: View {
     }
     
     func stopTimer(isFinish: Bool = false) {
+        gameState = isFinish == true ? .게임완료 : .초기화
+        
         gamePlayTimer?.invalidate()
         gamePlayTimer = nil
-        
-        gameState = isFinish == true ? .게임완료 : .초기화
     }
     
     func pauseTimer() {
