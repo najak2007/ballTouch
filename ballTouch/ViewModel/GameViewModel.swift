@@ -64,6 +64,10 @@ class GameViewModel: NSObject, ObservableObject {
         } catch {
             return 0
         }
+
+        if searchIndex > 0 {
+            searchIndex = searchIndex - 1
+        }
         
         return searchIndex
     }
