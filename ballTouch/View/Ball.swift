@@ -28,12 +28,12 @@ struct Ball: Identifiable {
             size = CGFloat.random(in: 50...100)
             color = .random
             point = (Int.random(in: 1...10)) * 10
-            label = Text(String(point))
+            label = Text(String(point)).font(.custom("GmarketSansTTFBold", size: 18)).foregroundColor(.white)
         } else {
             size = 0
             color = .clear
             point = (Int.random(in: 1...10)) * 10
-            label = Text("")
+            label = Text("").font(.custom("GmarketSansTTFBold", size: 18)).foregroundColor(.white)
         }
         
         if selectedGameObjective == .합산_점수 {
@@ -54,7 +54,7 @@ struct Ball: Identifiable {
                     reproduceBall(geometry: geometry, ballIndex: ballIndex)
                 } else {
                     size = 0
-                    label = Text("")
+                    label = Text("").font(.custom("GmarketSansTTFBold", size: 18)).foregroundColor(.white)
                 }
             }
             
@@ -90,7 +90,7 @@ struct Ball: Identifiable {
             }
         }
         size = CGFloat.random(in: 50...100)
-        label = Text(String(point))
+        label = Text(String(point)).font(.custom("GmarketSansTTFBold", size: 18)).foregroundColor(.white)
         color = .random
         touched = false
     }
@@ -98,7 +98,7 @@ struct Ball: Identifiable {
     mutating func setBallZeroSize() {
         if playMode == .두더지 {
             size = 0
-            label = Text("")
+            label = Text("").font(.custom("GmarketSansTTFBold", size: 18)).foregroundColor(.white)
         }
     }
     
