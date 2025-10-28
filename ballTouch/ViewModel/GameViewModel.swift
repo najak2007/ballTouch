@@ -91,7 +91,7 @@ class GameViewModel: NSObject, ObservableObject {
         if gameResultDataArr.count == 0 {
             return []
         }
-        let fetchGameDatas = gameResultDataArr.filter({$0.gamePlayMode == gamePlayMode && $0.gamePlaySecond == gamePlaySecond })
+        let fetchGameDatas = gameResultDataArr.filter({$0.gamePlayMode == (gamePlayMode == .빗방울 ? 0 : 1) && $0.gamePlaySecond == gamePlaySecond })
         return fetchGameDatas
     }
     
