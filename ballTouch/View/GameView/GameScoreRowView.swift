@@ -13,7 +13,11 @@ struct GameScoreRowView: View {
     var gameResultData: GameResultData
     @State private var gamePlayerName: String = ""
     var rankIndex: Int
-
+    @State var addGameResultDatas: [GameResultData] = []
+    
+    @State private var isAddGameResult: Bool = false
+    @State private var isAnimating: Bool = false
+    
     var inputHandler: (GameResultData, String) -> Void
     var inputErrorHandler: (InputTypeError) -> Void
     
@@ -21,14 +25,19 @@ struct GameScoreRowView: View {
         HStack {
             Text(setRankAttributedString((String(format: "%02d", rankIndex)), commentLabel: "위"))
                 .monospacedDigit()
-                .frame(width: 50)
+                .frame(width: 60)
             Spacer()
             
-            Text(setRankAttributedString((setCommaChange(gameResultData.score)), commentLabel: "점"))
-                .font(.custom("GmarketSansTTFMedium", size: 18))
-                .foregroundColor(Color("1F2020"))
-                .monospacedDigit()
-                .frame(width: 120)
+            if self.isAddGameResult {
+                Text(setRankAttributedString((setCommaChange(gameResultData.score)), commentLabel: "점"))
+                    .monospacedDigit()
+                    .frame(width: 120)
+                    .underline()
+            } else {
+                Text(setRankAttributedString((setCommaChange(gameResultData.score)), commentLabel: "점"))
+                    .monospacedDigit()
+                    .frame(width: 120)
+            }
             
             Spacer()
             
@@ -36,7 +45,7 @@ struct GameScoreRowView: View {
                 .font(.custom("GmarketSansTTFMedium", size: 18))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-                .frame(width: 150)
+                .frame(width: 140)
                 .submitLabel(.done)
                 .onSubmit {
                     let trimWhiteSpace = gamePlayerName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -57,7 +66,10 @@ struct GameScoreRowView: View {
         }
         .onAppear {
             self.gamePlayerName = gameResultData.playName
+            self.isAddGameResult = addGameDataForResult(gameResultData)
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 5)
     }
     
     func setCommaChange(_ intValue: Int) -> String {
@@ -71,13 +83,31 @@ struct GameScoreRowView: View {
         
         if let fullRange = attributedString.range(of: "\(title) \(commentLabel)") {
             attributedString[fullRange].foregroundColor = Color("1F2020")
-            attributedString[fullRange].font = .custom("GmarketSansTTFMedium", size: 18)
+            attributedString[fullRange].font = .custom(isAddGameResult == false ? "GmarketSansTTFMedium" : "GmarketSansTTFBold", size: isAddGameResult == false ? 18 : 22)
+            attributedString[fullRange].underlineColor = isAddGameResult == false ? .clear : .red
         }
         
         if let rankLabelRange = attributedString.range(of: "\(commentLabel)") {
             attributedString[rankLabelRange].foregroundColor = Color("1F2020").opacity(0.6)
-            attributedString[rankLabelRange].font = .custom("GmarketSansTTFMedium", size: 16)
+            attributedString[rankLabelRange].font = .custom(isAddGameResult == false ? "GmarketSansTTFMedium" : "GmarketSansTTFBold", size: isAddGameResult == false ? 16 : 20)
         }
         return attributedString
+    }
+    
+    func addGameDataForResult(_ rowItemData: GameResultData) -> Bool {
+        if addGameResultDatas.count == 0 {
+            return false
+        }
+        
+        for index in 0..<addGameResultDatas.count {
+            let addItemData = addGameResultDatas[index]
+            
+            if rowItemData.date == addItemData.date,
+               rowItemData.score == addItemData.score,
+               rowItemData.gameGroupID == addItemData.gameGroupID {
+                return true
+            }
+        }
+        return false
     }
 }

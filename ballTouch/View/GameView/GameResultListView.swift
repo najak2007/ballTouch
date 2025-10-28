@@ -27,6 +27,8 @@ struct GameResultListView: View {
     @State private var toast: Toast? = nil
     
     @State private var currentVisibleItem: GameResultData?
+    @State var position = ScrollPosition(edge: .bottom)
+    @State var addGameResultDatas: [GameResultData] = []
     
     var body: some View {
         NavigationView {
@@ -51,7 +53,7 @@ struct GameResultListView: View {
                 ScrollView {
                     LazyVStack {
                         ForEach(0..<tableCount, id:\.self) { index in
-                            GameScoreRowView(gameResultData: self.gameResultDatas[index], rankIndex: (index + 1),  inputHandler: { (gameResultData, playName) in
+                            GameScoreRowView(gameResultData: self.gameResultDatas[index], rankIndex: (index + 1), addGameResultDatas: addGameResultDatas, inputHandler: { (gameResultData, playName) in
                                 gameViewModel.setGameResultForPlayNameUpdate(resultData: gameResultData, playName: playName) { isCompletion in
                                     fetchGameResultData(playMode: gamePlayMode, playTimeIndex: scoreTableIndex)
                                 }
@@ -63,7 +65,10 @@ struct GameResultListView: View {
                     }
                     .scrollTargetLayout()
                 }
-                .scrollPosition(id: $currentVisibleItem, anchor: .bottom)
+                .scrollPosition($position)
+                .onAppear {
+                    position.scrollTo(id: scrollPosition)
+                }
 #else
                 List {
                     Section {
