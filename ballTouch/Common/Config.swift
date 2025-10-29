@@ -21,4 +21,6 @@ class Config {
     
     static let GAME_RESULT_DATA_MAX_COUNT: Int = 1000
     static let GAME_PLAYER_NAME_COUNT: Int = 15
+    
+    static let GAME_SCORE_EMPTY_IMAGE: CGFloat = 160
 }

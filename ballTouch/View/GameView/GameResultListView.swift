@@ -53,9 +53,9 @@ struct GameResultListView: View {
                 if tableCount == 0 {
                     Spacer()
 
-                    Text("Game 점수가 없습니다.")
-                        .font(.custom("GmarketSansTTFBold", size: 24))
-                        .foregroundColor(Color("1F2020"))
+                    Image("game_score_empty")
+                        .resizable()
+                        .frame(width: Config.GAME_SCORE_EMPTY_IMAGE, height: Config.GAME_SCORE_EMPTY_IMAGE)
                     
                     Spacer()
                 } else {
