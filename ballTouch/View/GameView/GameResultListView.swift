@@ -50,24 +50,34 @@ struct GameResultListView: View {
                     self.scoreTableIndex = savedTimeIndex
                 }
                 
-                ScrollView {
-                    LazyVStack {
-                        ForEach(0..<tableCount, id:\.self) { index in
-                            GameScoreRowView(gameResultData: self.gameResultDatas[index], rankIndex: (index + 1), addGameResultDatas: addGameResultDatas, inputHandler: { (gameResultData, playName) in
-                                gameViewModel.setGameResultForPlayNameUpdate(resultData: gameResultData, playName: playName) { isCompletion in
-                                    fetchGameResultData(playMode: gamePlayMode, playTimeIndex: scoreTableIndex)
-                                }
-                            }, inputErrorHandler: { errorType in
-                                inputErrorHandler(errorType)
-                            })
-                            .id(index)
+                if tableCount == 0 {
+                    Spacer()
+
+                    Text("Game 점수가 없습니다.")
+                        .font(.custom("GmarketSansTTFBold", size: 24))
+                        .foregroundColor(Color("1F2020"))
+                    
+                    Spacer()
+                } else {
+                    ScrollView {
+                        LazyVStack {
+                            ForEach(0..<tableCount, id:\.self) { index in
+                                GameScoreRowView(gameResultData: self.gameResultDatas[index], rankIndex: (index + 1), addGameResultDatas: addGameResultDatas, inputHandler: { (gameResultData, playName) in
+                                    gameViewModel.setGameResultForPlayNameUpdate(resultData: gameResultData, playName: playName) { isCompletion in
+                                        fetchGameResultData(playMode: gamePlayMode, playTimeIndex: scoreTableIndex)
+                                    }
+                                }, inputErrorHandler: { errorType in
+                                    inputErrorHandler(errorType)
+                                })
+                                .id(index)
+                            }
                         }
+                        .scrollTargetLayout()
                     }
-                    .scrollTargetLayout()
-                }
-                .scrollPosition($position)
-                .onAppear {
-                    position.scrollTo(id: scrollPosition)
+                    .scrollPosition($position)
+                    .onAppear {
+                        position.scrollTo(id: scrollPosition)
+                    }
                 }
 #else
                 List {
