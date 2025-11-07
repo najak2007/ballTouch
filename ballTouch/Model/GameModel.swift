@@ -35,13 +35,19 @@ enum GamePlayMode: String, CaseIterable, Identifiable, Decodable, Encodable {
     }
 }
 
-class GameResultData: Object {
+enum InputTypeError {
+    case 이름_글자갯수
+    case 이름_미입력
+}
+
+class GameResultData: Object, Comparable {
     @objc dynamic var date: Date = Date()
     @objc dynamic var gameGroupID: String = ""
     @objc dynamic var score: Int = 0
-    dynamic var gamePlayMode: GamePlayMode = .빗방울
+    @objc dynamic var gamePlayMode: Int = 0
     @objc dynamic var gamePlaySecond: Int = 10
     @objc dynamic var playName: String = ""
+    @objc dynamic var isShow: Bool = false
     
     override init() {
         super.init()
@@ -51,8 +57,13 @@ class GameResultData: Object {
         self.date = date
         self.gameGroupID = gameGroupID
         self.score = score
-        self.gamePlayMode = gamePlayMode
+        self.gamePlayMode = gamePlayMode == .빗방울 ? 0 : 1
         self.gamePlaySecond = gamePlaySecond
         self.playName = playName
+        self.isShow = false
+    }
+    
+    static func < (lhs: GameResultData, rhs: GameResultData) -> Bool {
+        return lhs.score < rhs.score
     }
 }
